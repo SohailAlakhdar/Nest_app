@@ -1,6 +1,6 @@
 {
   "singleQuote": true,
-  "parser": "flow",
+  "parser": "typescript",
   "endOfLine": "crlf"
 
 }
