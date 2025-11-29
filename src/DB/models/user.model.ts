@@ -38,21 +38,21 @@ export class User {
     get: function (this: User) {
       return this.firstName + ' ' + this.lastName;
     },
-    set: function (value: string) {
+    set: function (this: HUserDocument, value: string) {
       // value => username
       const [firstName, lastName] = value.split(' ') || [];
       this.set({ firstName, lastName });
     },
   })
   username: string;
-
+  // --
   @Prop({
     type: String,
     required: true,
     unique: true,
   })
   email: string;
-
+  // --
   @Prop({
     type: String,
     enum: ProviderEnum,
@@ -60,12 +60,12 @@ export class User {
     required: true,
   })
   provider: string;
-
+  // --
   @Prop({
     type: String,
-    required: function (this: User) {
+    required: function (this: HUserDocument) {
       // return this.provider == ProviderEnum.Google ? false : true;
-      return this.provider !== ProviderEnum.Google;
+      return (this.provider as ProviderEnum) !== ProviderEnum.Google;
     },
   })
   password: string;
