@@ -1,3 +1,4 @@
+import { OtpRepository } from './../../DB/repository/otp.repository';
 import { UserRepository } from './../../DB/repository/user.repository';
 import {
   BadRequestException,
@@ -5,16 +6,20 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { IUser } from 'src/commen/interfaces/user.interface';
-import { SignupBodyDto } from './dto/signup.dto';
-import { HUserDocument } from 'src/DB';
-import { generateHash } from 'src/commen';
+import { UserDocument } from 'src/DB';
+import { generateHash, otpEnum } from 'src/commen';
 import { emailEvent } from 'src/commen/utils/email';
+import { SignupBodyDto } from './dto/auth.dto';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class AuthenticationService {
   users: IUser[] = [];
-  constructor(private readonly userRepository: UserRepository) {}
-  async signup(data: SignupBodyDto): Promise<HUserDocument> {
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly otpRepository: OtpRepository,
+  ) {}
+  async signup(data: SignupBodyDto): Promise<UserDocument> {
     const { username, email, password } = data;
     const checkUserExist = await this.userRepository.findOne({
       filter: {
@@ -36,7 +41,17 @@ export class AuthenticationService {
     if (!user) {
       throw new BadRequestException('Error');
     }
-    emailEvent.emit('ConfirmEmail', { to: email, otp: '6546321' });
+    const [otp] = await this.otpRepository.create({
+      data: [
+        {
+          code: '89999',
+          createdBy: user._id,
+          expiredAt: new Date(Date.now() + 2 * 60 * 1000),
+          type: otpEnum.ConfirmEmail,
+        },
+      ],
+    });
+
     return user;
   }
 }

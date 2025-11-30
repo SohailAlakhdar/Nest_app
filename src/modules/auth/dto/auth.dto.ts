@@ -6,6 +6,7 @@ import {
   IsString,
   IsStrongPassword,
   Length,
+  MinLength,
   Validate,
   ValidateIf,
   ValidationArguments,
@@ -27,7 +28,9 @@ export class LoginBodyDto {
   @IsEmail()
   email: string;
 
-  @IsStrongPassword()
+  // @IsStrongPassword()
+  @IsString()
+  @MinLength(2)
   password: string;
 }
 // SignupBodyDto
@@ -39,7 +42,6 @@ export class SignupBodyDto extends LoginBodyDto {
   @ValidateIf((data: SignupBodyDto) => {
     return Boolean(data.password);
   })
-
   @Validate(MatchBetweenFeilds)
   confirmPassword: string;
 }

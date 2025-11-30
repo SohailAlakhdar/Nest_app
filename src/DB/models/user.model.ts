@@ -8,6 +8,7 @@ import {
 import { HydratedDocument } from 'mongoose';
 import { generateHash } from 'src/commen';
 import { GenderEnum, ProviderEnum } from 'src/commen/enums/user.enum';
+import { OtpDocument } from './otp.model';
 
 @Schema({
   strictQuery: true,
@@ -38,7 +39,7 @@ export class User {
     get: function (this: User) {
       return this.firstName + ' ' + this.lastName;
     },
-    set: function (this: HUserDocument, value: string) {
+    set: function (this: UserDocument, value: string) {
       // value => username
       const [firstName, lastName] = value.split(' ') || [];
       this.set({ firstName, lastName });
@@ -60,10 +61,10 @@ export class User {
     required: true,
   })
   provider: string;
-  // --
+
   @Prop({
     type: String,
-    required: function (this: HUserDocument) {
+    required: function (this: UserDocument) {
       // return this.provider == ProviderEnum.Google ? false : true;
       return (this.provider as ProviderEnum) !== ProviderEnum.Google;
     },
@@ -83,11 +84,19 @@ export class User {
     required: false,
   })
   changeCredentialsTime: Date;
+
+  @Virtual()
+  otp: OtpDocument[];
 }
+export type UserDocument = HydratedDocument<User>;
 
 export const userSchema = SchemaFactory.createForClass(User);
 
-export type HUserDocument = HydratedDocument<User>;
+userSchema.virtual('otp', {
+  ref: 'Otp',
+  localField: '_id',
+  foreignField: 'createdBy',
+});
 
 export const UserModel = MongooseModule.forFeatureAsync([
   {
