@@ -85,6 +85,12 @@ export class User {
   })
   changeCredentialsTime: Date;
 
+  @Prop({
+    type: Date,
+    required: false,
+  })
+  confirmedAt: Date;
+  
   @Virtual()
   otp: OtpDocument[];
 }

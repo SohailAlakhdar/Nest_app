@@ -1,4 +1,28 @@
 import { CreateOptions, DeleteResult, FlattenMaps, HydratedDocument, Model, MongooseUpdateQueryOptions, PopulateOptions, ProjectionType, QueryOptions, RootFilterQuery, SortOrder, Types, UpdateQuery, UpdateWriteOpResult } from "mongoose";
+/*
+aggregate
+bulkWrite
+count
+countDocuments
+createCollection
+deleteOne
+deleteMany
+estimatedDocumentCount
+find
+findOne 
+findOneAndDelete
+findOneAndReplace
+findOneAndUpdate
+init
+insertMany
+replaceOne
+save
+update
+updateOne
+updateMany
+validate
+*/
+//
 export type Lean<T> = FlattenMaps<T>;
 export abstract class DatabaseRepository<TRowDocument, TDocument=HydratedDocument<TRowDocument>> {
     constructor(protected readonly model: Model<TDocument>) {}

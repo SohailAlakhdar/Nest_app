@@ -23,11 +23,13 @@ export class MatchBetweenFeilds implements ValidatorConstraintInterface {
     return 'password mismach with confirmPassword';
   }
 }
-// LoginBodyDto
-export class LoginBodyDto {
+// ResendConfirmEmail
+export class ResendConfirmEmailBodyDto {
   @IsEmail()
   email: string;
-
+}
+// LoginBodyDto
+export class LoginBodyDto extends ResendConfirmEmailBodyDto {
   // @IsStrongPassword()
   @IsString()
   @MinLength(2)
@@ -50,4 +52,12 @@ export class SignupQueryDto {
   @Length(2, 20)
   @IsString()
   flag: string;
+}
+// ConfirmEmailBodyDto
+export class ConfirmEmailBodyDto {
+  @IsEmail()
+  email: string;
+  @IsString()
+  @MinLength(4)
+  otp: string;
 }
