@@ -15,7 +15,7 @@ import {
   ResendConfirmEmailBodyDto,
   SignupBodyDto,
 } from './dto/auth.dto';
-import { OtpDocument, UserDocument } from 'src/DB';
+import { OtpDocument, User, UserDocument } from 'src/DB';
 @Controller('auth')
 export class AuthenticationController {
   constructor(private readonly authService: AuthenticationService) {}
@@ -52,19 +52,27 @@ export class AuthenticationController {
     body: ConfirmEmailBodyDto,
   ): Promise<{
     message: string;
+    data: UserDocument;
   }> {
-    await this.authService.confirmEmail(body);
+    const user: UserDocument = await this.authService.confirmEmail(body);
     return {
       message: 'Done',
+      data: user,
     };
   }
 
   // LOGIN
-  // @HttpCode(HttpStatus.OK)
   @Post('login')
-  login(@Body() body: LoginBodyDto) {
+  async login(
+    @Body(new ValidationPipe({ stopAtFirstError: true })) body: LoginBodyDto,
+  ): Promise<{
+    message: string;
+    data: { credentials: { access_token; refresh_token } };
+  }> {
+    const credentials = await this.authService.login(body);
     return {
-      message: 'User Login successfully!',
+      message: 'Done',
+      data: { credentials },
     };
   }
 }

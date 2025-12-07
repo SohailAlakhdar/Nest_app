@@ -1,12 +1,21 @@
 import { Get, Injectable } from '@nestjs/common';
-import { IUser } from 'src/commen/interfaces/user.interface';
+import { User, UserDocument, UserRepository } from 'src/DB';
 
 @Injectable()
 export class UserService {
-  constructor() {}
+  constructor(private readonly userRepository: UserRepository) {}
 
   @Get()
-  AllUsers(): IUser[] {
-    return [{ id: 2, username: 'sohail', email: 'sohail@', password: '55' }];
+  async AllUsers(): Promise<User[]> {
+    const users = (await this.userRepository.find({})) || [];
+    return users;
+  }
+  // : Promise<UserDocument>
+  @Get()
+  async profle(userId) {
+    const user = await this.userRepository.findOne({
+      filter: { _id: userId },
+    });
+    return user;
   }
 }

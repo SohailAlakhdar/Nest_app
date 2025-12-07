@@ -7,3 +7,8 @@ export enum ProviderEnum {
   System = 'system',
   Google = 'google',
 }
+export enum RoleEnum {
+  User = 'user',
+  Admin = 'admin',
+  SuperAdmin = 'superAdmin',
+}

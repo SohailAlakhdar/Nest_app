@@ -29,8 +29,9 @@ export class ResendConfirmEmailBodyDto {
   email: string;
 }
 // LoginBodyDto
-export class LoginBodyDto extends ResendConfirmEmailBodyDto {
-  // @IsStrongPassword()
+export class LoginBodyDto {
+  @IsEmail()
+  email: string;
   @IsString()
   @MinLength(2)
   password: string;
@@ -59,5 +60,5 @@ export class ConfirmEmailBodyDto {
   email: string;
   @IsString()
   @MinLength(4)
-  otp: string;
+  code: string;
 }

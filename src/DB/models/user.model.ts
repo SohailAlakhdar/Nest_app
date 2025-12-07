@@ -7,7 +7,7 @@ import {
 } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { generateHash } from 'src/commen';
-import { GenderEnum, ProviderEnum } from 'src/commen/enums/user.enum';
+import { GenderEnum, ProviderEnum, RoleEnum } from 'src/commen/enums/user.enum';
 import { OtpDocument } from './otp.model';
 
 @Schema({
@@ -70,14 +70,21 @@ export class User {
     },
   })
   password: string;
-
+  // GENDER
   @Prop({
     type: String,
     enum: GenderEnum,
     default: GenderEnum.Male,
     required: true,
   })
-  gender: string;
+  gender: GenderEnum;
+  // ROLE
+  @Prop({
+    type: String,
+    enum: RoleEnum,
+    default: RoleEnum.User,
+  })
+  role: RoleEnum;
 
   @Prop({
     type: Date,
@@ -90,7 +97,13 @@ export class User {
     required: false,
   })
   confirmedAt: Date;
-  
+  // ----
+  @Prop({
+    type: Date,
+    required: false,
+  })
+  changeCredentialsAt: Date;
+  // ----
   @Virtual()
   otp: OtpDocument[];
 }
