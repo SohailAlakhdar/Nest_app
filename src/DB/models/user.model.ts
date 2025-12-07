@@ -7,7 +7,8 @@ import {
 } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { generateHash } from 'src/commen';
-import { GenderEnum, ProviderEnum } from 'src/commen/enums/user.enum';
+import { GenderEnum, ProviderEnum, RoleEnum } from 'src/commen/enums/user.enum';
+import { OtpDocument } from './otp.model';
 
 @Schema({
   strictQuery: true,
@@ -38,21 +39,21 @@ export class User {
     get: function (this: User) {
       return this.firstName + ' ' + this.lastName;
     },
-    set: function (value: string) {
+    set: function (this: UserDocument, value: string) {
       // value => username
       const [firstName, lastName] = value.split(' ') || [];
       this.set({ firstName, lastName });
     },
   })
   username: string;
-
+  // --
   @Prop({
     type: String,
     required: true,
     unique: true,
   })
   email: string;
-
+  // --
   @Prop({
     type: String,
     enum: ProviderEnum,
@@ -63,31 +64,58 @@ export class User {
 
   @Prop({
     type: String,
-    required: function (this: User) {
+    required: function (this: UserDocument) {
       // return this.provider == ProviderEnum.Google ? false : true;
-      return this.provider !== ProviderEnum.Google;
+      return (this.provider as ProviderEnum) !== ProviderEnum.Google;
     },
   })
   password: string;
-
+  // GENDER
   @Prop({
     type: String,
     enum: GenderEnum,
     default: GenderEnum.Male,
     required: true,
   })
-  gender: string;
+  gender: GenderEnum;
+  // ROLE
+  @Prop({
+    type: String,
+    enum: RoleEnum,
+    default: RoleEnum.User,
+  })
+  role: RoleEnum;
 
   @Prop({
     type: Date,
     required: false,
   })
   changeCredentialsTime: Date;
+
+  @Prop({
+    type: Date,
+    required: false,
+  })
+  confirmedAt: Date;
+  // ----
+  @Prop({
+    type: Date,
+    required: false,
+  })
+  changeCredentialsAt: Date;
+  // ----
+  @Virtual()
+  otp: OtpDocument[];
 }
+export type UserDocument = HydratedDocument<User>;
 
 export const userSchema = SchemaFactory.createForClass(User);
 
-export type HUserDocument = HydratedDocument<User>;
+userSchema.virtual('otp', {
+  ref: 'Otp',
+  localField: '_id',
+  foreignField: 'createdBy',
+});
 
 export const UserModel = MongooseModule.forFeatureAsync([
   {

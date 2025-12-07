@@ -6,6 +6,7 @@ import {
   IsString,
   IsStrongPassword,
   Length,
+  MinLength,
   Validate,
   ValidateIf,
   ValidationArguments,
@@ -22,12 +23,17 @@ export class MatchBetweenFeilds implements ValidatorConstraintInterface {
     return 'password mismach with confirmPassword';
   }
 }
+// ResendConfirmEmail
+export class ResendConfirmEmailBodyDto {
+  @IsEmail()
+  email: string;
+}
 // LoginBodyDto
 export class LoginBodyDto {
   @IsEmail()
   email: string;
-
-  @IsStrongPassword()
+  @IsString()
+  @MinLength(2)
   password: string;
 }
 // SignupBodyDto
@@ -39,7 +45,6 @@ export class SignupBodyDto extends LoginBodyDto {
   @ValidateIf((data: SignupBodyDto) => {
     return Boolean(data.password);
   })
-
   @Validate(MatchBetweenFeilds)
   confirmPassword: string;
 }
@@ -48,4 +53,12 @@ export class SignupQueryDto {
   @Length(2, 20)
   @IsString()
   flag: string;
+}
+// ConfirmEmailBodyDto
+export class ConfirmEmailBodyDto {
+  @IsEmail()
+  email: string;
+  @IsString()
+  @MinLength(4)
+  code: string;
 }

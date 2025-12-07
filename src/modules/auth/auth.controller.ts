@@ -3,13 +3,19 @@ import {
   Controller,
   HttpCode,
   HttpStatus,
+  Patch,
   Post,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthenticationService } from './auth.service';
-import { LoginBodyDto, SignupBodyDto } from './dto/signup.dto';
-import { HUserDocument } from 'src/DB';
+import {
+  ConfirmEmailBodyDto,
+  LoginBodyDto,
+  ResendConfirmEmailBodyDto,
+  SignupBodyDto,
+} from './dto/auth.dto';
+import { OtpDocument, User, UserDocument } from 'src/DB';
 @Controller('auth')
 export class AuthenticationController {
   constructor(private readonly authService: AuthenticationService) {}
@@ -17,26 +23,56 @@ export class AuthenticationController {
   // SIGNUP
   @Post('signup')
   async signup(
-    @Body( new ValidationPipe({stopAtFirstError:true})) body: SignupBodyDto,
-  ) :Promise<{
-      message:string,
-      data:HUserDocument
-    }>{
-    const user  = await this.authService.signup(body)
-    console.log({ body });
+    @Body(new ValidationPipe({ stopAtFirstError: true })) body: SignupBodyDto,
+  ): Promise<{
+    message: string;
+    data: UserDocument;
+  }> {
+    const user = await this.authService.signup(body);
     return {
-      message: "Done",
-      data:user
+      message: 'Done',
+      data: user,
     };
   }
-  // LOGIN
-  @HttpCode(HttpStatus.OK)
-  @Post('login')
-  login(
-    @Body() body: LoginBodyDto,
-  ) {
+  @Post('resend-confirm-email')
+  async resendConfirmEmail(
+    @Body(new ValidationPipe({ stopAtFirstError: true }))
+    body: ResendConfirmEmailBodyDto,
+  ): Promise<{
+    message: string;
+  }> {
+    await this.authService.resendConfirmEmail(body);
     return {
-      message: 'User Login successfully!',
+      message: 'Done',
+    };
+  }
+  @Patch('confirm-email')
+  async confirmEmail(
+    @Body(new ValidationPipe({ stopAtFirstError: true }))
+    body: ConfirmEmailBodyDto,
+  ): Promise<{
+    message: string;
+    data: UserDocument;
+  }> {
+    const user: UserDocument = await this.authService.confirmEmail(body);
+    return {
+      message: 'Done',
+      data: user,
+    };
+  }
+
+  // LOGIN
+  @Post('login')
+  async login(
+    @Body(new ValidationPipe({ stopAtFirstError: true })) body: LoginBodyDto,
+  ): Promise<{
+    message: string;
+    data: { credentials: { access_token; refresh_token } };
+  }> {
+    const credentials = await this.authService.login(body);
+    return {
+      message: 'Done',
+      data: { credentials },
     };
   }
 }
