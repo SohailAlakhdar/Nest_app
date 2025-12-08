@@ -154,7 +154,7 @@ export class AuthenticationService {
         { sub: user._id },
         {
           secret: process.env.ACCESS_USER_TOKEN_SIGNATURE || 'dsdsddddssd',
-          expiresIn: 60,
+          expiresIn: 60 * 60 * 24,
         },
       ),
       refresh_token: await this.jwtService.signAsync(

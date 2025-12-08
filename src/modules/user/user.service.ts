@@ -12,7 +12,7 @@ export class UserService {
   }
   // : Promise<UserDocument>
   @Get()
-  async profle(userId) {
+  async profile(userId) {
     const user = await this.userRepository.findOne({
       filter: { _id: userId },
     });
