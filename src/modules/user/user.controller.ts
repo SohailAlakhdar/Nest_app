@@ -1,5 +1,5 @@
 import { UserService } from './user.service';
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Req } from '@nestjs/common';
 import { Request } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
 import { User, UserDocument } from 'src/DB';
@@ -9,17 +9,15 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
   @Get('/')
   profile(
+    @Req()
     req: Request & {
       credentials: { user: UserDocument; decoded: JwtPayload };
     },
   ) {
-    // const user = await this.userService.profle(userId);
     console.log({
-      // lang: req.headers['Accept-Language'],
-      // credentials: req.credentials,
+      lang: req.headers['accept-language'],
+      credentials: req.credentials,
     });
-    console.log(req);
-    
 
     return {
       message: 'Done',
