@@ -9,9 +9,10 @@ import type {
 } from 'jsonwebtoken';
 import { RoleEnum } from 'src/commen/enums';
 import { signatureLevelEnum, tokenEnum } from 'src/commen/enums/token.enum';
-import { UserDocument, UserModel, UserRepository } from 'src/DB';
+import { UserDocument, UserRepository } from 'src/DB';
 import {
   BadRequestException,
+  Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -21,15 +22,7 @@ import { UserModule } from 'src/modules/user/user.module';
 import { Types } from 'mongoose';
 import { IAuthJwtPayload } from '../interfaces/token.interface';
 
-// ACCESS_USER_TOKEN_SIGNATURE="SsfiojfiosfUSER"
-// REFRESH_USER_TOKEN_SIGNATURE="Sfsoifjsfoijs73USER"
-
-// ACCESS_SYSTEM_TOKEN_SIGNATURE="SsfiojfiosfSYSTEM"
-// REFRESH_SYSTEM_TOKEN_SIGNATURE="Sfsoifjsfoijs73SYSTEM"
-
-// ACCESS_TOKEN_EXPIRES_IN=3600
-// REFRESH_TOKEN_EXPIRES_IN=31536000
-
+@Injectable()
 export class TokenService {
   constructor(
     private readonly userRepository: UserRepository,
@@ -161,7 +154,7 @@ export class TokenService {
     if (await this.tokenRepository.findOne({ filter: { jti: decoded.jti } })) {
       throw new UnauthorizedException('In-valid or old login credentials');
     }
-    const user = await this.userRepository.findOne({
+    const user = await this.tokenRepository.findOne({
       filter: { _id: decoded.sub },
     });
     console.log({ user });

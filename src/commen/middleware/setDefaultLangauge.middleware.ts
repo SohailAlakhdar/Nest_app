@@ -1,4 +1,3 @@
-import { tokenEnum } from './../enums/token.enum';
 import { NextFunction, Request, Response } from 'express';
 
 export const setDefaultLangauage = (
