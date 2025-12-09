@@ -2,10 +2,8 @@ import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { JwtService } from '@nestjs/jwt';
-import { OtpModel, OtpRepository, UserModel, UserRepository } from 'src/DB';
-import { TokenModel } from 'src/DB/models/token.model';
-import { AuthenticationMiddleware } from 'src/commen';
-import { TokenService } from 'src/commen/services/token.service';
+import { OtpModel, OtpRepository, TokenModel, UserModel, UserRepository } from 'src/DB';
+import { AuthenticationMiddleware, TokenService } from 'src/commen';
 
 @Module({
   imports: [UserModel, TokenModel, OtpModel],
