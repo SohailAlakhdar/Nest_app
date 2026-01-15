@@ -13,6 +13,7 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
+import { IsMatch } from 'src/commen/decorators/match.decorator';
 
 @ValidatorConstraint({ name: 'Match_Between_Feilds', async: false })
 export class MatchBetweenFeilds implements ValidatorConstraintInterface {
@@ -45,7 +46,10 @@ export class SignupBodyDto extends LoginBodyDto {
   @ValidateIf((data: SignupBodyDto) => {
     return Boolean(data.password);
   })
-  @Validate(MatchBetweenFeilds)
+  @IsString() 
+  // @IsMatch(['password'], { message: 'Passwords do not match' })
+  // @IsMatch(['password'])
+  @IsMatch('password')
   confirmPassword: string;
 }
 // SignupQueryDto

@@ -2,9 +2,8 @@ import { TokenDocument as TDocument } from './../models/token.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { DatabaseRepository } from './database.repository';
 import { Injectable } from '@nestjs/common';
-import { User } from '../models';
-import { Model } from 'mongoose';
 import { Token } from '../models/token.model';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class TokenRepository extends DatabaseRepository<Token> {

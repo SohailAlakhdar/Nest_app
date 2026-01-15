@@ -1,0 +1,87 @@
+NEST
+
+
+Request
+ ↓
+Middleware
+ ↓
+Guard
+ ↓
+Pipe
+ ↓
+Interceptor (before)
+ ↓
+Controller
+ ↓
+Interceptor (after)
+ ↓
+Response
+
+🔐 Authentication (Auth) in NestJS
+Common methods:
+JWT (most common)
+Sessions
+OAuth (Google, Facebook, etc.)
+Example flow (JWT):
+User logs in with email/password
+Server returns a JWT token
+Client sends token in every request
+Server verifies token
+
+
+2️⃣ Guard – ACCESS control
+Purpose
+Decides: Allow or deny access
+Used for:
+Authentication
+Authorization
+Roles
+
+3️⃣ Pipe – DATA validation & transform
+Purpose
+Works on inputs
+Used for:
+Validation
+Type conversion
+Sanitization
+
+4️⃣ Interceptor – BEFORE & AFTER controller
+Purpose
+Wraps execution
+Used for:
+Response formatting
+Performance logging
+Caching
+
+
+
+| Feature     | Purpose                            |
+| ----------- | ---------------------------------- |
+| Middleware  | Logging, request modification      |
+| Guard       | Authentication & authorization     |
+| Pipe        | Validation & transformation        |
+| Interceptor | Logging, response shaping, caching |
+
+
+
+E-commerce
+Modules:
+1- User
+2- Auth
+3- Orders
+4- Category
+5- Brand
+6- Cart
+7- Wishlist
+8- Reviews
+9- Product
+---------------------------
+the Sequence:
+user
+Brand
+Category
+Product
+Cart
+Wishlist
+Order
+Reviews

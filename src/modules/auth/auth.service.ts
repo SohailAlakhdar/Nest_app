@@ -7,15 +7,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { IUser } from 'src/commen/interfaces/user.interface';
-import { UserDocument, OtpDocument, User } from 'src/DB';
-import {
-  comparePassword,
-  generateHash,
-  generateOTP,
-  otpEnum,
-  ProviderEnum,
-} from 'src/commen';
-import { emailEvent } from 'src/commen/utils/email';
 import {
   ConfirmEmailBodyDto,
   LoginBodyDto,
@@ -24,8 +15,12 @@ import {
 } from './dto/auth.dto';
 import { Types } from 'mongoose';
 import { getRemainingSeconds } from 'src/commen/utils/transformTime';
-import { sign } from 'jsonwebtoken';
 import { JwtService } from '@nestjs/jwt';
+import { UserDocument } from 'src/DB/models/user.model';
+import { otpEnum } from 'src/commen/enums/otp.enum';
+import { ProviderEnum } from 'src/commen/enums/user.enum';
+import { comparePassword, generateHash } from 'src/commen/utils/security/hash.security';
+import { generateOTP } from 'src/commen/utils/otp';
 
 @Injectable()
 export class AuthenticationService {
@@ -35,6 +30,7 @@ export class AuthenticationService {
     private readonly otpRepository: OtpRepository,
     private readonly jwtService: JwtService,
   ) {}
+  
   private async createConfirmEmailOtp(userId: Types.ObjectId) {
     return await this.otpRepository.create({
       data: [
@@ -47,6 +43,7 @@ export class AuthenticationService {
       ],
     });
   }
+
   // SIGNUP
   async signup(data: SignupBodyDto): Promise<UserDocument> {
     const { username, email, password } = data;

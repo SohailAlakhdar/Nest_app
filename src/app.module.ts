@@ -17,7 +17,7 @@ import { MongooseModule } from '@nestjs/mongoose';
       serverSelectionTimeoutMS: 30000,
     }),
     AuthenticationModule,
-    UserModule
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

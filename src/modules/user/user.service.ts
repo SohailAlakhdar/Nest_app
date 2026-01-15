@@ -1,5 +1,6 @@
 import { Get, Injectable } from '@nestjs/common';
-import { User, UserDocument, UserRepository } from 'src/DB';
+import { User } from 'src/DB/models/user.model';
+import { UserRepository } from 'src/DB/repository/user.repository';
 
 @Injectable()
 export class UserService {
@@ -16,6 +17,7 @@ export class UserService {
     const user = await this.userRepository.findOne({
       filter: { _id: userId },
     });
+
     return user;
   }
 }
