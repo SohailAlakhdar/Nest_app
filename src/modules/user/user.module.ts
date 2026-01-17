@@ -16,6 +16,7 @@ import { diskStorage } from 'multer';
 import { Request } from 'express';
 import { randomUUID } from 'crypto';
 import { existsSync, mkdirSync } from 'fs';
+import { S3Service } from 'src/commen/services/s3.service';
 
 @Module({
   imports: [UserModel, TokenModel, OtpModel,
@@ -29,6 +30,7 @@ import { existsSync, mkdirSync } from 'fs';
     OtpRepository,
     TokenRepository,
     JwtService,
+    S3Service
   ], // providers is mean what services are used in this module
   exports: [], // exports is mean what services are used outside this module
 })
