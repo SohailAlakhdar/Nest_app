@@ -1,8 +1,7 @@
-import { OtpDocument as TDocument } from '../models/otp.model';
+import { Otp, OtpDocument as TDocument } from '../models/otp.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { DatabaseRepository } from './database.repository';
 import { Injectable } from '@nestjs/common';
-import { Otp } from '../models';
 import { Model } from 'mongoose';
 
 @Injectable()

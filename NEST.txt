@@ -1,0 +1,118 @@
+NEST
+
+
+
+
+
+Request
+
+↓
+
+Middleware
+
+↓
+
+Guard
+
+↓
+
+Pipe
+
+↓
+
+Interceptor (before)
+
+↓
+
+Controller
+
+↓
+
+Interceptor (after)
+
+↓
+
+Response
+
+
+
+🔐 Authentication (Auth) in NestJS
+
+Common methods:
+
+JWT (most common)
+
+Sessions
+
+OAuth (Google, Facebook, etc.)
+
+Example flow (JWT):
+
+* User logs in with email/password
+* Server returns a JWT token
+* Client sends token in every request
+* Server verifies token
+
+
+
+🛡️ Guards
+
+What is a Guard?
+
+A Guard decides:
+
+* Allow request or block it?
+
+Used for:
+
+Authentication
+
+Authorization (roles, permissions)
+
+
+
+🧪 Pipes
+
+What is a Pipe?
+
+A Pipe is used for:
+
+✅ Data validation
+
+🔄 Data transformation
+
+Common uses:
+
+* Validate input (DTOs)
+* Convert string → number
+* Remove invalid data
+
+🟢 Pipes run BEFORE controller logic.
+
+
+
+🔁 Interceptors
+
+What is an Interceptor?
+
+An Interceptor:
+
+Runs before and after a request
+
+Can modify:
+
+Request
+
+Response
+
+Used for:
+
+* Logging
+* Response formatting
+* Performance timing
+* Error handling
+
+
+
+
+

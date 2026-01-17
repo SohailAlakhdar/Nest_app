@@ -2,9 +2,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { MongooseModule, Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types, HydratedDocument } from 'mongoose';
-import { generateHash, otpEnum } from 'src/commen';
-import { emailEvent } from 'src/commen/utils/email';
-import { User, UserDocument } from './user.model';
+import { otpEnum } from 'src/commen/enums/otp.enum';
+import { emailEvent } from 'src/commen/utils/email/email.event';
+import { generateHash } from 'src/commen/utils/security/hash.security';
 
 @Schema({
   strictQuery: true,

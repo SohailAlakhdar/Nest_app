@@ -1,14 +1,29 @@
 import { Module } from '@nestjs/common';
 import { AuthenticationService } from './auth.service';
 import { AuthenticationController } from './auth.controller';
-import { OtpModel, OtpRepository, UserModel, UserRepository } from 'src/DB';
+import { Otp, OtpModel } from 'src/DB/models/otp.model';
+import { OtpRepository } from 'src/DB/repository/otp.repository';
+import { UserModel } from 'src/DB/models/user.model';
+import { TokenModel } from 'src/DB/models/token.model';
+import { UserService } from '../user/user.service';
+import { TokenService } from 'src/commen/services/token.service';
+import { UserRepository } from 'src/DB/repository/user.repository';
+import { TokenRepository } from 'src/DB/repository/token.repository';
 import { JwtService } from '@nestjs/jwt';
 
 @Module({
-  imports: [UserModel, OtpModel],
+  imports: [UserModel, TokenModel, OtpModel],
   controllers: [AuthenticationController],
-  providers: [AuthenticationService, UserRepository, OtpRepository, JwtService],
-  exports: [AuthenticationService],
+  providers: [
+    AuthenticationService,
+    OtpRepository,
+    UserService,
+    TokenService,
+    UserRepository,
+    TokenRepository,
+    JwtService,
+  ],
+  exports: [],
 })
 export class AuthenticationModule {
   constructor() {}

@@ -6,9 +6,9 @@ import {
   Virtual,
 } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { generateHash } from 'src/commen';
 import { GenderEnum, ProviderEnum, RoleEnum } from 'src/commen/enums/user.enum';
 import { OtpDocument } from './otp.model';
+import { generateHash } from 'src/commen/utils/security/hash.security';
 
 @Schema({
   strictQuery: true,
@@ -98,12 +98,7 @@ export class User {
   })
   confirmedAt: Date;
   // ----
-  @Prop({
-    type: Date,
-    required: false,
-  })
-  changeCredentialsAt: Date;
-  // ----
+
   @Virtual()
   otp: OtpDocument[];
 }
@@ -132,3 +127,6 @@ export const UserModel = MongooseModule.forFeatureAsync([
     },
   },
 ]);
+export const UserSchema = SchemaFactory.createForClass(User);
+
+// Export schema definition for module, NOT the full MongooseModule

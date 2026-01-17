@@ -7,20 +7,18 @@ import type {
   SignOptions,
   VerifyOptions,
 } from 'jsonwebtoken';
-import { RoleEnum } from 'src/commen/enums';
 import { signatureLevelEnum, tokenEnum } from 'src/commen/enums/token.enum';
-import { UserDocument, UserRepository } from 'src/DB';
 import {
   BadRequestException,
   Injectable,
-  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { TokenModel } from 'src/DB/models/token.model';
 import { TokenRepository } from 'src/DB/repository/token.repository';
-import { UserModule } from 'src/modules/user/user.module';
 import { Types } from 'mongoose';
 import { IAuthJwtPayload } from '../interfaces/token.interface';
+import { UserRepository } from 'src/DB/repository/user.repository';
+import { UserDocument } from 'src/DB/models/user.model';
+import { RoleEnum } from '../enums/user.enum';
 
 @Injectable()
 export class TokenService {
@@ -39,6 +37,8 @@ export class TokenService {
   }): Promise<string> => {
     return sign(payload, secret, options);
   };
+
+  // Refresh or Access
   verifyToken = async ({
     token,
     secret = process.env.ACCESS_USER_TOKEN_SIGNATURE as string,
@@ -99,33 +99,7 @@ export class TokenService {
     //     refresh_token,
     // };
   };
-  //   generate access_token and refresh_token
-  createLoginCredentials = async (user: UserDocument) => {
-    const signatureLevel = await this.detectSignatureLevel(user.role);
-    const signatuers = await this.getSignature(signatureLevel);
-    const jwtid: string = uuid();
-    const access_token = await this.generateToken({
-      payload: { _id: user._id },
-      secret: signatuers.access_token,
-      options: {
-        expiresIn: Number(process.env.ACCESS_TOKEN_EXPIRES_IN),
-        jwtid,
-      },
-    });
-    const refresh_token = await this.generateToken({
-      payload: { _id: user._id },
 
-      secret: signatuers.refresh_token,
-      options: {
-        expiresIn: Number(process.env.REFRESH_TOKEN_EXPIRES_IN),
-        jwtid,
-      },
-    });
-    return {
-      access_token,
-      refresh_token,
-    };
-  };
 
   // output => decoded and user
   decodedToken = async ({
@@ -147,21 +121,21 @@ export class TokenService {
           ? signatures.refresh_token
           : signatures.access_token,
     });
-    console.log({ decoded });
+    // console.log({ decoded });
     if (!decoded.iat || !decoded.sub) {
       throw new BadRequestException('invalid Token payload');
     }
     if (await this.tokenRepository.findOne({ filter: { jti: decoded.jti } })) {
       throw new UnauthorizedException('In-valid or old login credentials');
     }
-    const user = await this.tokenRepository.findOne({
-      filter: { _id: decoded.sub },
-    });
-    console.log({ user });
+    const user = (await this.userRepository.findOne({
+      filter: { _id: new Types.ObjectId(decoded.sub) },
+    })) as UserDocument | null;
+    // console.log({ user });
     if (!user) {
       throw new BadRequestException('Not Rigister Account');
     }
-    if ((user.changeCredentialsAt?.getTime() || 0) > decoded.iat * 1000) {
+    if ((user.changeCredentialsTime?.getTime() || 0) > decoded.iat * 1000) {
       throw new UnauthorizedException('Invalid or old login credentials');
     }
     return { user, decoded };
@@ -186,3 +160,32 @@ export class TokenService {
     return result;
   };
 }
+
+
+//   generate access_token and refresh_token
+  // createLoginCredentials = async (user: UserDocument) => {
+  //   const signatureLevel = await this.detectSignatureLevel(user.role);
+  //   const signatuers = await this.getSignature(signatureLevel);
+  //   const jwtid: string = uuid();
+  //   const access_token = await this.generateToken({
+  //     payload: { _id: user._id },
+  //     secret: signatuers.access_token,
+  //     options: {
+  //       expiresIn: Number(process.env.ACCESS_TOKEN_EXPIRES_IN),
+  //       jwtid,
+  //     },
+  //   });
+  //   const refresh_token = await this.generateToken({
+  //     payload: { _id: user._id },
+
+  //     secret: signatuers.refresh_token,
+  //     options: {
+  //       expiresIn: Number(process.env.REFRESH_TOKEN_EXPIRES_IN),
+  //       jwtid,
+  //     },
+  //   });
+  //   return {
+  //     access_token,
+  //     refresh_token,
+  //   };
+  // };

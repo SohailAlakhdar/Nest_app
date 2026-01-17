@@ -2,7 +2,7 @@ import { EventEmitter } from 'node:events';
 import { sendEmail } from '../email/send.email';
 import Mail from 'nodemailer/lib/mailer';
 import { verifyEmailTemplate } from './templates/verify.templete';
-import { otpEnum } from 'src/commen/enums';
+import { otpEnum } from 'src/commen/enums/otp.enum';
 
 export interface IEmail extends Mail.Options {
   otp: string;
