@@ -15,7 +15,7 @@ import {
   ResendConfirmEmailBodyDto,
   SignupBodyDto,
 } from './dto/auth.dto';
-import { OtpDocument, User, UserDocument } from 'src/DB';
+import { UserDocument } from 'src/DB/models/user.model';
 @Controller('auth')
 export class AuthenticationController {
   constructor(private readonly authService: AuthenticationService) {}

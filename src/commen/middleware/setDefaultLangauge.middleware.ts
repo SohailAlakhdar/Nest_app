@@ -5,7 +5,6 @@ export const setDefaultLangauage = (
   res: Response,
   next: NextFunction,
 ) => {
-  console.log('language middleware...');
   req.headers['accept-language'] = req.headers['accept-language'] ?? 'EN';
   next();
 };

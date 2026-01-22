@@ -1,8 +1,9 @@
 import { Type } from '@nestjs/common';
-import { Request } from 'express';
+import type { Request } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
 import { Types } from 'mongoose';
-import { UserDocument } from 'src/DB';
+import { UserDocument } from 'src/DB/models/user.model';
+import { tokenEnum } from '../enums/token.enum';
 
 /**
  * --------------JwtPayload ------------------------
@@ -37,9 +38,12 @@ export interface IAuthJwtPayload extends JwtPayload {
   iat: number;
 }
 
-export interface ICredentials extends Request {
-  credentials: {
-    user: UserDocument;
-    decoded: IAuthJwtPayload;
-  };
+export interface ICredentials {
+  user: UserDocument;
+  decoded: JwtPayload;
+}
+
+export interface IAuthRequest extends Request {
+  credentials: ICredentials;
+  tokenType?: tokenEnum;
 }
