@@ -34,24 +34,15 @@ import { User } from 'src/DB/models/user.model';
 export class UserController {
   constructor(
     private readonly userService: UserService,
-    private readonly reflector: Reflector,
-    private readonly s3Service: S3Service
   ) { }
   // @UseInterceptors(LoggingInterceptor)
   @Auth([RoleEnum.User, RoleEnum.Admin], tokenEnum.refresh)
   @Get('/')
   profile(
     @UserDecorator() user: UserDocument,
-    // @Req()
-    // req: IAuthRequest,
-  ) {
-    return of([{ message: 'Done', data: user }]).pipe(delay(10000));
-    // console.log({ user });
 
-    // return {
-    //   message: 'Done',
-    //   data: user,
-    // };
+  ) {
+    return of([{ message: 'Done', data: user }])
   }
 
   @Get('/users')
@@ -74,14 +65,16 @@ export class UserController {
   }
 
   @Auth([RoleEnum.User])
-  @UseInterceptors(FileInterceptor('profileImage', cloudMulter({ storageApproch: storageEnum.disk, fileSizeMB: 2, validation: fileValidation.image })))
+  @UseInterceptors(FileInterceptor('profileImage',
+    cloudMulter({ storageApproch: storageEnum.disk, fileSizeMB: 2, validation: fileValidation.image })))
   @Patch("/profile-image")
   async profileImage(
+    @UserDecorator() user: UserDocument,
     @UploadedFile(ParseFilePipe)
     profileImage: Express.Multer.File) {
-    await this.userService.profileImage
+    const url = await this.userService.profileImage(profileImage, user)
     console.log(profileImage);
-    return { message: "Done", profileImage }
+    return { message: "Done", url }
   }
 
   @Auth([RoleEnum.User])

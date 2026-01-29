@@ -9,6 +9,7 @@ import { HydratedDocument } from 'mongoose';
 import { GenderEnum, ProviderEnum, RoleEnum } from 'src/commen/enums/user.enum';
 import { OtpDocument } from './otp.model';
 import { generateHash } from 'src/commen/utils/security/hash.security';
+import { IUser } from 'src/commen/interfaces/user.interface';
 
 @Schema({
   strictQuery: true,
@@ -16,7 +17,7 @@ import { generateHash } from 'src/commen/utils/security/hash.security';
   toJSON: { virtuals: true },
   toObject: { virtuals: true },
 })
-export class User {
+export class User implements IUser {
   @Prop({
     type: String,
     required: true,
@@ -60,7 +61,7 @@ export class User {
     default: ProviderEnum.System,
     required: true,
   })
-  provider: string;
+  provider: ProviderEnum;
 
   @Prop({
     type: String,
@@ -101,6 +102,11 @@ export class User {
 
   @Virtual()
   otp: OtpDocument[];
+
+  @Prop({
+    type: String,
+  })
+  profilePicture: string;
 }
 export type UserDocument = HydratedDocument<User>;
 

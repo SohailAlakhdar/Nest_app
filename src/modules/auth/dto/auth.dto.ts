@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Allow,
   IsEmail,
@@ -46,7 +45,7 @@ export class SignupBodyDto extends LoginBodyDto {
   @ValidateIf((data: SignupBodyDto) => {
     return Boolean(data.password);
   })
-  @IsString() 
+  @IsString()
   // @IsMatch(['password'], { message: 'Passwords do not match' })
   // @IsMatch(['password'])
   @IsMatch('password')

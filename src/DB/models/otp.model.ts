@@ -3,6 +3,7 @@
 import { MongooseModule, Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types, HydratedDocument } from 'mongoose';
 import { otpEnum } from 'src/commen/enums/otp.enum';
+import { IOtp } from 'src/commen/interfaces/otp.interface';
 import { emailEvent } from 'src/commen/utils/email/email.event';
 import { generateHash } from 'src/commen/utils/security/hash.security';
 
@@ -12,7 +13,7 @@ import { generateHash } from 'src/commen/utils/security/hash.security';
   //   toJSON: { virtuals: true },
   //   toObject: { virtuals: true },
 })
-export class Otp {
+export class Otp implements IOtp {
   @Prop({ type: String, required: true })
   code: string;
 

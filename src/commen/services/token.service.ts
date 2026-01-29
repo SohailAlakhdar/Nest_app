@@ -149,8 +149,8 @@ export class TokenService {
             jti: decoded?.jti,
             expiresIn:
               decoded?.iat + Number(process.env.REFRESH_TOKEN_EXPIRES_IN),
-            userId: decoded?._id,
-            // userId: decoded?._id as Types.ObjectId,
+            createdBy: decoded?._id,
+            // createdBy: decoded?._id as Types.ObjectId,
           },
         ],
       })) || [];

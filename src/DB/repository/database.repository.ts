@@ -1,4 +1,4 @@
-import { CreateOptions, DeleteResult, FlattenMaps, HydratedDocument, Model, MongooseUpdateQueryOptions, PopulateOptions, ProjectionType, QueryOptions, RootFilterQuery, SortOrder, Types, UpdateQuery, UpdateWriteOpResult } from "mongoose";
+import { CreateOptions, DeleteResult, FlattenMaps, HydratedDocument, Model, MongooseUpdateQueryOptions, PipelineStage, PopulateOptions, ProjectionType, QueryOptions, RootFilterQuery, SortOrder, Types, UpdateQuery, UpdateWriteOpResult } from "mongoose";
 /*
 aggregate
 bulkWrite
@@ -9,7 +9,7 @@ deleteOne
 deleteMany
 estimatedDocumentCount
 find
-findOne 
+findOne
 findOneAndDelete
 findOneAndReplace
 findOneAndUpdate
@@ -24,8 +24,8 @@ validate
 */
 //
 export type Lean<T> = FlattenMaps<T>;
-export abstract class DatabaseRepository<TRowDocument, TDocument=HydratedDocument<TRowDocument>> {
-    constructor(protected readonly model: Model<TDocument>) {}
+export abstract class DatabaseRepository<TRowDocument, TDocument = HydratedDocument<TRowDocument>> {
+    constructor(protected readonly model: Model<TDocument>) { }
     // FIND
     async find({
         filter = {},
@@ -35,15 +35,15 @@ export abstract class DatabaseRepository<TRowDocument, TDocument=HydratedDocumen
         filter?: RootFilterQuery<TRowDocument>;
         select?: ProjectionType<TRowDocument> | undefined;
         options?:
-            | (QueryOptions<TDocument> & {
-                  populate?: PopulateOptions[];
-                  skip?: number;
-                  limit?: number;
-                  sort?: Record<string, SortOrder>;
-                  lean?: boolean;
-                  cursor?: any;
-              })
-            | null;
+        | (QueryOptions<TDocument> & {
+            populate?: PopulateOptions[];
+            skip?: number;
+            limit?: number;
+            sort?: Record<string, SortOrder>;
+            lean?: boolean;
+            cursor?: any;
+        })
+        | null;
     }): Promise<TDocument[] | [] | Lean<TDocument>[]> {
         const dec = this.model.find(filter || {}).select(select || "");
         if (options?.populate) {
@@ -67,45 +67,45 @@ export abstract class DatabaseRepository<TRowDocument, TDocument=HydratedDocumen
     async paginate({
         filter,
         select,
-        options,
-        page = 1,
+        options = {},
+        page = 'all',
         size = 5,
     }: {
-        filter?: RootFilterQuery<TRowDocument>;
+        filter: RootFilterQuery<TRowDocument>;
         select?: ProjectionType<TRowDocument> | undefined;
-        options?: QueryOptions<TDocument> & {
+        options?: (QueryOptions<TDocument> & {
             populate?: PopulateOptions[];
+            skip?: number;
+            limit?: number;
             sort?: Record<string, SortOrder>;
             lean?: boolean;
-        };
-        page?: number;
+        });
+        page?: number | 'all';
         size?: number;
     }): Promise<{
-        docs: TDocument[] | Lean<TDocument>[];
-        totalDocs: number;
-        totalPages: number;
+        totalDocs: number | undefined;
+        totalPages: number | undefined;
         page: number;
         size: number;
+        docs: TDocument[] | Lean<TDocument>[];
     }> {
-        const skip = (page - 1) * size;
-        const dec = this.model.find(filter || {}).select(select || "");
-        if (options?.populate)
-            dec.populate(options.populate as PopulateOptions[]);
-        if (options?.lean) dec.lean(options.lean);
-        if (options?.sort) dec.sort(options.sort);
-        dec.skip(skip).limit(size);
-
-        const [docs, totalDocs] = await Promise.all([
-            dec.exec(),
-            this.model.countDocuments(filter),
-        ]);
-
+        let totalPages: number | undefined = undefined
+        let totalDocs: number | undefined = undefined
+        if (page !== "all") {
+            console.log({ page, size });
+            page = Math.floor(!page || page < 1 ? 1 : page);
+            options.limit = Math.floor(size < 1 || !size ? 5 : size);
+            options.skip = (page - 1) * options.limit;
+            totalDocs = await this.model.countDocuments(filter)
+            totalPages = Math.ceil(totalDocs / options.limit)
+        }
+        let docs = await this.find({ filter, select, options })
         return {
-            docs,
             totalDocs,
-            totalPages: Math.ceil(totalDocs / size),
-            page,
+            totalPages,
+            page: page === "all" ? 1 : page,
             size,
+            docs,
         };
     }
     // FIND_ONE
@@ -136,7 +136,7 @@ export abstract class DatabaseRepository<TRowDocument, TDocument=HydratedDocumen
         data: Partial<TRowDocument>[];
         options?: CreateOptions;
     }): Promise<TDocument[]> {
-        return await this.model.create(data || [], options) ;
+        return await this.model.create(data || [], options);
     }
     // Insert_Many
     async insertMany({
@@ -177,16 +177,46 @@ export abstract class DatabaseRepository<TRowDocument, TDocument=HydratedDocumen
         options,
     }: {
         filter: RootFilterQuery<TRowDocument>;
-        update: UpdateQuery<TDocument>;
+        update: UpdateQuery<TDocument> | PipelineStage[];
         options?: QueryOptions<TDocument> | null;
     }): Promise<TDocument | Lean<TDocument> | null> {
+        if (Array.isArray(update)) {
+            update.push({
+                $set: {
+                    __v: { $add: ['$__v', 1] },
+                }
+            })
+            return await this.model.findOneAndUpdate(filter || {}, update, {
+                new: true,
+                runValidators: true,
+                options,
+            },);
+        }
         return await this.model.findOneAndUpdate(
             filter,
-            { ...update, $inc: { __v: 1 } },
-            options
+            {
+                ...update,
+                $inc: {
+                    __v: 1,
+                }
+            },
+            {
+                new: true,
+                runValidators: true,
+                ...options,
+            },
         );
     }
-
+    // FIND_ONE_AND_DELETE
+    async findOneAndDelete({
+        filter,
+    }: {
+        filter: RootFilterQuery<TRowDocument>;
+    }): Promise<TDocument | Lean<TDocument> | null> {
+        return await this.model.findByIdAndDelete(
+            filter || {},
+        );
+    }
     // FIDN_BY_ID_AND_UPDATE
     async findByIdAndUpdate({
         id,

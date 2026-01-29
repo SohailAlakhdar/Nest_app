@@ -7,6 +7,7 @@ import {
 } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { IToken } from 'src/commen/interfaces/token.interface';
+import { IUser } from 'src/commen/interfaces/user.interface';
 /**
  * jti => JSON Web Token (JWT) ID
  */
@@ -17,7 +18,7 @@ import { IToken } from 'src/commen/interfaces/token.interface';
   toJSON: { virtuals: true },
   toObject: { virtuals: true },
 })
-export class Token {
+export class Token implements IToken {
   @Prop({
     type: String,
     required: true,
@@ -32,8 +33,9 @@ export class Token {
   })
   expiresIn: number;
 
+
   @Virtual()
-  userId: Types.ObjectId;
+  createdBy: Types.ObjectId | IUser;
 }
 
 // TokenSchema

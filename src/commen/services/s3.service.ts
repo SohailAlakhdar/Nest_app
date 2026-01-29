@@ -19,6 +19,9 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { storageEnum } from "../enums/multer.enum";
 import { randomUUID } from "crypto";
 
+import { promisify } from "node:util";
+import { pipeline } from "node:stream";
+export const createS3WriteStreamPipe = promisify(pipeline);
 
 @Injectable()
 export class S3Service {
@@ -33,6 +36,7 @@ export class S3Service {
             },
         });
     }
+
     // ================= Upload File =================
     async uploadFile({
         storageApproach = storageEnum.memory,
@@ -62,6 +66,7 @@ export class S3Service {
         await this.s3.send(command);
         return Key;
     }
+
     // upload-Large-File
     async uploadLargeFile({
         storageApproach = storageEnum.disk,

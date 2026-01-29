@@ -1,4 +1,4 @@
-import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { createParamDecorator, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 
 export const UserDecorator = createParamDecorator(
   (data: unknown, context: ExecutionContext) => {
@@ -17,6 +17,9 @@ export const UserDecorator = createParamDecorator(
 
       default:
         break;
+    }
+    if (!req) {
+      throw new UnauthorizedException('Request not found');
     }
     return req.credentials.user;
   },

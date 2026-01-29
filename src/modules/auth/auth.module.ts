@@ -10,6 +10,7 @@ import { TokenService } from 'src/commen/services/token.service';
 import { UserRepository } from 'src/DB/repository/user.repository';
 import { TokenRepository } from 'src/DB/repository/token.repository';
 import { JwtService } from '@nestjs/jwt';
+import { S3Service } from 'src/commen/services/s3.service';
 
 @Module({
   imports: [UserModel, TokenModel, OtpModel],
@@ -22,6 +23,7 @@ import { JwtService } from '@nestjs/jwt';
     UserRepository,
     TokenRepository,
     JwtService,
+    S3Service
   ],
   exports: [],
 })

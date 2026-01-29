@@ -4,6 +4,7 @@ import { JwtPayload } from 'jsonwebtoken';
 import { Types } from 'mongoose';
 import { UserDocument } from 'src/DB/models/user.model';
 import { tokenEnum } from '../enums/token.enum';
+import { IUser } from './user.interface';
 
 /**
  * --------------JwtPayload ------------------------
@@ -26,10 +27,14 @@ iat is issued at — timestamp when the token was issued.
 jti is JWT ID — a unique identifier for the token.
  */
 
+
 export interface IToken {
   jti: string;
   expiresIn: number;
-  userId: Types.ObjectId;
+  createdBy?: Types.ObjectId | IUser;
+
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface IAuthJwtPayload extends JwtPayload {
@@ -47,3 +52,16 @@ export interface IAuthRequest extends Request {
   credentials: ICredentials;
   tokenType?: tokenEnum;
 }
+
+
+
+// import { Document, Types } from 'mongoose';
+
+// export interface ITokenDocument extends Document {
+//   jti: string;
+//   expiresIn: number;
+
+//   userId?: Types.ObjectId; // virtual
+//   createdAt?: Date;
+//   updatedAt?: Date;
+// }

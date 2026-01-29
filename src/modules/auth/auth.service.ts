@@ -24,13 +24,12 @@ import { generateOTP } from 'src/commen/utils/otp';
 
 @Injectable()
 export class AuthenticationService {
-  users: IUser[] = [];
   constructor(
     private readonly userRepository: UserRepository,
     private readonly otpRepository: OtpRepository,
     private readonly jwtService: JwtService,
-  ) {}
-  
+  ) { }
+
   private async createConfirmEmailOtp(userId: Types.ObjectId) {
     return await this.otpRepository.create({
       data: [

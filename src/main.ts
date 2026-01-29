@@ -11,10 +11,12 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use('/uploads', express.static(path.resolve('uploads')));
   app.use(setDefaultLangauage);
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
       transform: true,
+      forbidNonWhitelisted: true,
     }),
   );
   app.useGlobalInterceptors(new LoggingInterceptor());

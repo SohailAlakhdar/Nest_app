@@ -6,6 +6,10 @@ import {
   registerDecorator,
 } from 'class-validator';
 
+/**
+ * property Scope
+ */
+
 // Custom validator class
 @ValidatorConstraint({ name: 'match_between_two_fields', async: false })
 export class MatchBetweenFields<T = any>

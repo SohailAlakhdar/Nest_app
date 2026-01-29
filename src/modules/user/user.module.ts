@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { AuthenticationMiddleware } from 'src/commen/middleware/authentication.middleware';
@@ -11,11 +11,6 @@ import { AuthenticationService } from '../auth/auth.service';
 import { UserModel } from 'src/DB/models/user.model';
 import { TokenModel } from 'src/DB/models/token.model';
 import { OtpModel } from 'src/DB/models/otp.model';
-import { MulterModule } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { Request } from 'express';
-import { randomUUID } from 'crypto';
-import { existsSync, mkdirSync } from 'fs';
 import { S3Service } from 'src/commen/services/s3.service';
 
 @Module({

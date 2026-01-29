@@ -7,6 +7,8 @@ import { resolve } from 'path';
 import { UserModule } from './modules/user/user.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { S3Service } from './commen/services/s3.service';
+import { BrandModule } from './modules/brand/brand.module';
+import { CategoryModule } from './modules/category/category.module';
 
 @Module({
   imports: [
@@ -19,8 +21,11 @@ import { S3Service } from './commen/services/s3.service';
     }),
     AuthenticationModule,
     UserModule,
+    BrandModule,
+    CategoryModule,
   ],
   controllers: [AppController],
+
   providers: [AppService, S3Service],
 })
-export class AppModule {}
+export class AppModule { }
