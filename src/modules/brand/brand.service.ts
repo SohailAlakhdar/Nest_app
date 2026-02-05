@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateBrandDto } from './dto/create-brand.dto';
-import { FindAllDto, UpdateBrandDto } from './dto/update-brand.dto';
+import {  UpdateBrandDto } from './dto/update-brand.dto';
 import { BrandRepository } from 'src/DB/repository/brand.repository';
 import { S3Service } from 'src/commen/services/s3.service';
 import { storageEnum } from 'src/commen/enums/multer.enum';
@@ -10,6 +10,7 @@ import { Types } from 'mongoose';
 import { BrandDocument } from 'src/DB/models/brand.model';
 import { Lean } from 'src/DB/repository/database.repository';
 import { IBrand } from 'src/commen/interfaces/brand.interface';
+import { FindAllDto } from 'src/commen/dtos/search.dto';
 
 @Injectable()
 export class BrandService {
@@ -110,7 +111,9 @@ export class BrandService {
   }
   async update(brandId: Types.ObjectId, updateBrandDto: UpdateBrandDto, user: UserDocument): Promise<BrandDocument | Lean<BrandDocument>> {
     if (updateBrandDto && await this.brandRepository.findOne({
-      filter: { name: updateBrandDto.name }
+      filter: {
+        name: updateBrandDto.name, _id: { $ne: brandId },
+      }
     })) {
       throw new ConflictException('Brand name already exists');
     }

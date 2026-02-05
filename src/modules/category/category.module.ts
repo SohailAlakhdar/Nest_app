@@ -10,11 +10,11 @@ import { CategoryModel } from 'src/DB/models/category.model';
 import { UserModel } from 'src/DB/models/user.model';
 import { TokenModel } from 'src/DB/models/token.model';
 import { BrandRepository } from 'src/DB/repository/brand.repository';
-import { BrnadModel } from 'src/DB/models/brand.model';
 import { BrandExistsValidator } from 'src/commen/decorators/mongoDBIds.decorator';
+import { BrandModel } from 'src/DB/models/brand.model';
 
 @Module({
-  imports: [CategoryModel, UserModel, TokenModel, BrnadModel],
+  imports: [CategoryModel, UserModel, TokenModel, BrandModel],
   controllers: [CategoryController],
   providers: [CategoryService, S3Service, CategoryRepository, TokenService, UserRepository, TokenRepository, BrandRepository, BrandExistsValidator],
 })

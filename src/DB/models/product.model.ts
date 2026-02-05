@@ -11,7 +11,7 @@ import { IProduct } from 'src/commen/interfaces/product.interface';
 })
 export class Product implements IProduct {
     @Prop({ type: Types.ObjectId })
-    _id?: Types.ObjectId;
+    id?: Types.ObjectId;
 
     @Prop({ required: true, trim: true })
     name: string;
@@ -24,7 +24,7 @@ export class Product implements IProduct {
         lowercase: true,
     })
     slug: string;
-    
+
     @Prop({ trim: true })
     description?: string;
 
@@ -33,6 +33,11 @@ export class Product implements IProduct {
 
     @Prop()
     discount?: number;
+    @Prop()
+    salePrice?: number;
+
+    @Prop()
+    assetFolderId?: string;
 
     @Prop({ unique: true, sparse: true }) // optional but unique if provided
     sku?: string;
@@ -92,7 +97,6 @@ export type ProductDocument = HydratedDocument<Product>;
 export const ProductSchema = SchemaFactory.createForClass(Product);
 
 
-
 // ---------------------------HOOKS
 
 ProductSchema.pre('save', function (next) {
@@ -102,8 +106,11 @@ ProductSchema.pre('save', function (next) {
             strict: true,
             remove: /[*+~.()'"!:@]/g,
         });
-        console.log(this.slug);
-
+    }
+    if (this.discount) {
+        this.salePrice = this.price * (1 - this.discount / 100);
+    } else {
+        this.salePrice = this.price;
     }
     next();
 });
@@ -111,20 +118,27 @@ ProductSchema.pre('save', function (next) {
 // hooks for update
 ProductSchema.pre(['findOneAndUpdate', 'updateOne'], function (next) {
     const update = this.getUpdate() as UpdateQuery<ProductDocument>;
-    if (update?.$set.name) {
+    if (update?.name) {
         this.setUpdate({
             ...update,
-            slug: slugify(update?.$set.name, {
+            slug: slugify(update?.name, {
                 lower: true,
                 strict: true,
                 remove: /[*+~.()'"!:@]/g,
             }),
         });
     }
+    if (update.discount) {
+        update.salePrice = update.price * (1 - update.discount / 100);
+        this.setUpdate({ ...update })
+    } else {
+      this.setUpdate({
+        ...update,
+        $unset: { salePrice: "" },
+      });    }
 
     const query = this.getQuery()
     console.log({ query });
-    console.log(query.paranoid);
     if (query.paranoid == false || query.paranoId == false) {
         this.setQuery({ ...query });
     } else {

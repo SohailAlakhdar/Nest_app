@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
-import { FindAllDto, UpdateCategoryDto } from './dto/update-category.dto';
+import {  UpdateCategoryDto } from './dto/update-category.dto';
 import { CategoryRepository } from 'src/DB/repository/category.repository';
 import { S3Service } from 'src/commen/services/s3.service';
 import { UserRepository } from 'src/DB/repository/user.repository';
@@ -12,6 +12,7 @@ import { set, Types } from 'mongoose';
 import { BrandRepository } from 'src/DB/repository/brand.repository';
 import { randomUUID } from 'crypto';
 import { PipelineStage } from 'mongoose';
+import { FindAllDto } from 'src/commen/dtos/search.dto';
 
 @Injectable()
 export class CategoryService {
@@ -110,7 +111,7 @@ export class CategoryService {
     const category = await this.categoryRepository.findOne({
       filter: { _id: categoryId },
     })
-     if (!category) throw new NotFoundException("Category not found");
+    if (!category) throw new NotFoundException("Category not found");
 
     if (category.image) await this.s3Service.deleteFile({ Key: category.image });
 

@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, Query, ValidationPipe, UsePipes, ParseFilePipe, Search } from '@nestjs/common';
 import { BrandService } from './brand.service';
 import { CreateBrandDto } from './dto/create-brand.dto';
-import { BrnadParamsDto, FindAllDto, UpdateBrandDto } from './dto/update-brand.dto';
+import { BrnadParamsDto,  UpdateBrandDto } from './dto/update-brand.dto';
 import { Auth } from 'src/commen/decorators/auth.decorator';
 import { endPoint } from './brand.endPoints';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -12,7 +12,10 @@ import type { UserDocument } from 'src/DB/models/user.model';
 import { successResponse } from 'src/commen/utils/response';
 import { UserDecorator } from 'src/commen/decorators/user.decorator';
 import { IResponse } from 'src/commen/interfaces/response.interface';
-import { BrandResponse, FindAllResponse } from './entities/brand.entity';
+import { BrandResponse} from './entities/brand.entity';
+import { FindAllDto } from 'src/commen/dtos/search.dto';
+import { IBrand } from 'src/commen/interfaces/brand.interface';
+import { FindAllResponse } from 'src/commen/entities/search.entity';
 
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
@@ -35,18 +38,18 @@ export class BrandController {
   @Get()
   async findAll(
     @Query() query: FindAllDto,
-  ): Promise<IResponse<FindAllResponse>> {
-    const brands = await this.brandService.findAll(query);
-    return successResponse<FindAllResponse>({ data: { brands } });
+  ): Promise<IResponse<FindAllResponse<IBrand>>> {
+    const result = await this.brandService.findAll(query);
+    return successResponse<FindAllResponse<IBrand>>({ data: { result } });
   }
 
   @Auth(endPoint.findAllArchives)
   @Get('archive')
   async findAllArchives(
     @Query() query: FindAllDto,
-  ): Promise<IResponse<FindAllResponse>> {
-    const brands = await this.brandService.findAll(query, true);
-    return successResponse<FindAllResponse>({ data: { brands } });
+  ): Promise<IResponse<FindAllResponse<IBrand>>> {
+    const result = await this.brandService.findAll(query, true);
+    return successResponse<FindAllResponse<IBrand>>({ data: { result } });
   }
 
   @Get(':brandId')

@@ -8,12 +8,3 @@ import { IBrand } from "src/commen/interfaces/brand.interface";
 export class BrandResponse {
     brand: IBrand
 }
-export class FindAllResponse {
-    brands: {
-        totalDocs: number | undefined;
-        totalPages: number | undefined;
-        page: number;
-        size: number;
-        docs: IBrand[];
-    }
-}

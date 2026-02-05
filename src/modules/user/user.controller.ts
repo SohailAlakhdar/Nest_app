@@ -2,9 +2,12 @@ import { UserService } from './user.service';
 import {
   BadRequestException,
   Controller,
+  Delete,
   Get,
+  Param,
   ParseFilePipe,
   Patch,
+  Post,
   Req,
   SetMetadata,
   UploadedFile,
@@ -16,6 +19,7 @@ import { Reflector } from '@nestjs/core';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import type { Request } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
+import { Types } from 'mongoose';
 import { delay, of } from 'rxjs';
 import { Auth } from 'src/commen/decorators/auth.decorator';
 import { UserDecorator } from 'src/commen/decorators/user.decorator';
@@ -87,4 +91,6 @@ export class UserController {
     console.log(coverImages);
     return { message: "Done", coverImages }
   }
+
+
 }

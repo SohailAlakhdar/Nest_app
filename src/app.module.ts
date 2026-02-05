@@ -9,6 +9,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { S3Service } from './commen/services/s3.service';
 import { BrandModule } from './modules/brand/brand.module';
 import { CategoryModule } from './modules/category/category.module';
+import { ProductModule } from './modules/product/product.module';
+import { CartModule } from './modules/cart/cart.module';
+import { OrderModule } from './modules/order/order.module';
 
 @Module({
   imports: [
@@ -23,6 +26,9 @@ import { CategoryModule } from './modules/category/category.module';
     UserModule,
     BrandModule,
     CategoryModule,
+    ProductModule,
+    CartModule,
+    OrderModule
   ],
   controllers: [AppController],
 

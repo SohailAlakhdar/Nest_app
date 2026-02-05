@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, ParseFilePipe, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
-import { CategoryParamsDto, FindAllDto, UpdateCategoryDto } from './dto/update-category.dto';
+import { CategoryParamsDto, UpdateCategoryDto } from './dto/update-category.dto';
 import { storageEnum } from 'src/commen/enums/multer.enum';
 import { Auth } from 'src/commen/decorators/auth.decorator';
 import { endPoint } from './category.endPoints';
@@ -11,8 +11,11 @@ import { fileValidation } from 'src/commen/utils/multer/valition.multer';
 import { UserDecorator } from 'src/commen/decorators/user.decorator';
 import type { UserDocument } from 'src/DB/models/user.model';
 import { IResponse } from 'src/commen/interfaces/response.interface';
-import type { CategoryResponse, FindAllResponse } from './entities/category.entity';
+import type { CategoryResponse } from './entities/category.entity';
 import { successResponse } from 'src/commen/utils/response';
+import { FindAllDto } from 'src/commen/dtos/search.dto';
+import { ICategory } from 'src/commen/interfaces/category.interface';
+import { FindAllResponse } from 'src/commen/entities/search.entity';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
 @Controller('category')
@@ -34,18 +37,18 @@ export class CategoryController {
   @Get()
   async findAll(
     @Query() query: FindAllDto,
-  ): Promise<IResponse<FindAllResponse>> {
-    const categorys = await this.categoryService.findAll(query);
-    return successResponse<FindAllResponse>({ data: { categorys } });
+  ): Promise<IResponse<FindAllResponse<ICategory>>> {
+    const result = await this.categoryService.findAll(query);
+    return successResponse<FindAllResponse<ICategory>>({ data: { result } });
   }
 
   @Auth(endPoint.findAllArchives)
   @Get('archive')
   async findAllArchives(
     @Query() query: FindAllDto,
-  ): Promise<IResponse<FindAllResponse>> {
-    const categorys = await this.categoryService.findAll(query, true);
-    return successResponse<FindAllResponse>({ data: { categorys } });
+  ): Promise<IResponse<FindAllResponse<ICategory>>> {
+    const result = await this.categoryService.findAll(query, true);
+    return successResponse<FindAllResponse<ICategory>>({ data: { result } });
   }
 
   @Get(':categoryId')

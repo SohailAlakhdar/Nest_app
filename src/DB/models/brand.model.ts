@@ -113,7 +113,7 @@ BrandSchema.pre(["find", "findOne", 'countDocuments'], async function (next) {
 });
 // ----------------------------------
 
-export const BrnadModel = MongooseModule.forFeature([
+export const BrandModel = MongooseModule.forFeature([
     {
         name: Brand.name,
         schema: BrandSchema,

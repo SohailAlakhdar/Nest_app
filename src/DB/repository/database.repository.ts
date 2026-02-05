@@ -213,7 +213,7 @@ export abstract class DatabaseRepository<TRowDocument, TDocument = HydratedDocum
     }: {
         filter: RootFilterQuery<TRowDocument>;
     }): Promise<TDocument | Lean<TDocument> | null> {
-        return await this.model.findByIdAndDelete(
+        return await this.model.findOneAndDelete(
             filter || {},
         );
     }

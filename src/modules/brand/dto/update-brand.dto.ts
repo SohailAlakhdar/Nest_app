@@ -15,22 +15,4 @@ export class BrnadParamsDto {
     brandId: Types.ObjectId
 }
 
-export class FindAllDto {
-    @Type(() => Number)
-    @IsPositive()
-    @IsOptional()
-    @IsNumber()
-    page?: number = 1;
-    @Type(() => Number)
-    @IsPositive()
-    @IsOptional()
-    @IsNumber()
-    @Min(1)
-    size?: number = 5;
-    @IsNotEmpty()
-    @IsOptional()
-    @IsString()
-    search?: string;
-}
-
 
