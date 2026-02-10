@@ -11,23 +11,22 @@ import { OrderResponse } from './entities/order.entity';
 import { Body, Controller, Delete, Get, Param, ParseFilePipe, Patch, Post, Query, UploadedFile, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { endPoint } from './order.endPoints';
 import { OrderService } from './order.service';
-import { CreateOrderDto } from './dto/create-Order.dto';
+import { CreateOrderDto } from './dto/create-order.dto';
 
 @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
-@Controller('Order')
+@Controller('order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) { }
 
   @Auth(endPoint.create)
-  @UseInterceptors(FileInterceptor('file',
-    cloudMulter({ storageApproch: storageEnum.disk, fileSizeMB: 2, validation: fileValidation.image })))
   @Post('create')
   async create(
     @Body() createOrderDto: CreateOrderDto,
-    @UploadedFile(ParseFilePipe) file: Express.Multer.File,
-    @UserDecorator() user: UserDocument): Promise<IResponse<OrderResponse>> {
-    const Order = await this.orderService.create(createOrderDto, user, file);
-    return successResponse<OrderResponse>({ status: 201, data: { Order } })
+    @UserDecorator() user: UserDocument
+  ): Promise<IResponse> {
+    const order = await this.orderService.create(createOrderDto, user);
+    // return successResponse<OrderResponse>({ status: 201, data: { order } })
+    return successResponse({ status: 201, data: { order } })
   }
 
   // @Get()

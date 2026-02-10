@@ -1,14 +1,11 @@
 import { Types } from 'mongoose';
-import { IsNotEmpty, IsOptional, IsArray, ValidateNested, IsEnum } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsNotEmpty, IsOptional, IsArray, ValidateNested, IsEnum, Matches, validate } from 'class-validator';
 import { IOrderProduct } from 'src/commen/interfaces/order.interface';
 import { PaymentMethodEnum } from 'src/commen/enums/order.enum';
+import { IsObjectId } from 'src/commen/decorators/mongoDBIds.decorator';
 
 export class CreateOrderDto {
-    @IsArray()
-    @ValidateNested({ each: true })
-    @Type(() => Object) // ideally map to IOrderProduct DTO
-    @IsNotEmpty()
+    @IsObjectId({ each: true })
     products: IOrderProduct[];
 
     @IsNotEmpty()
@@ -19,11 +16,13 @@ export class CreateOrderDto {
     address: string;
 
     @IsNotEmpty()
+    @Matches(/^(?:\+20|0)?1[0125]\d{8}$/, {
+        message: 'Invalid Egyptian phone number',
+    })
     phone: string;
 
     @IsOptional()
     note?: string;
 
-    @IsNotEmpty()
-    userId: Types.ObjectId;
+
 }

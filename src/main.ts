@@ -9,7 +9,7 @@ import * as express from 'express';
 async function bootstrap() {
   const port = process.env.PORT ?? 3000;
   const app = await NestFactory.create(AppModule);
-  app.use('/uploads', express.static(path.resolve('uploads')));
+  app.use('upload', express.static(path.resolve('upload')));
   app.use(setDefaultLangauage);
 
   app.useGlobalPipes(

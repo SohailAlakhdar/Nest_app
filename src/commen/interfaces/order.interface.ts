@@ -51,7 +51,8 @@ export interface IOrderProduct {
     slug?: string;
 
     productId: Types.ObjectId | IProduct
-    price: number;
+    unitprice: number;
+    finalTotal: number;
     quantity: number;
     image?: string;
 

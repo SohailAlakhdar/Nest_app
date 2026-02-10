@@ -1,18 +1,14 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateOrderDto } from './dto/create-Order.dto';
-import { UpdateOrderDto } from './dto/update-Order.dto';
-import { OrderRepository } from 'src/DB/repository/Order.repository';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { S3Service } from 'src/commen/services/s3.service';
 import { UserRepository } from 'src/DB/repository/user.repository';
 import { UserDocument } from 'src/DB/models/user.model';
-import { OrderDocument } from 'src/DB/models/Order.model';
 import { Lean } from 'src/DB/repository/database.repository';
-import { FolderPathEnum, storageEnum } from 'src/commen/enums/multer.enum';
-import { set, Types } from 'mongoose';
 import { BrandRepository } from 'src/DB/repository/brand.repository';
-import { randomUUID } from 'crypto';
-import { PipelineStage } from 'mongoose';
 import { FindAllDto } from 'src/commen/dtos/search.dto';
+import { OrderDocument, OrderProduct } from 'src/DB/models/order.model';
+import { OrderRepository } from 'src/DB/repository/order.repository';
+import { CreateOrderDto } from './dto/create-order.dto';
+import { ProductRepository } from 'src/DB/repository/product.repository';
 
 @Injectable()
 export class OrderService {
@@ -20,6 +16,7 @@ export class OrderService {
     private readonly orderRepository: OrderRepository,
     private readonly s3Service: S3Service,
     private readonly userRepository: UserRepository,
+    private readonly productRepository: ProductRepository,
     private readonly brandRepository: BrandRepository) { }
 
   /**
@@ -32,7 +29,7 @@ export class OrderService {
   total price
 
     user: userId,
-    items: cart.products,
+    products: cart.products,
     totalPrice,
     status: 'PENDING',
     paymentMethod
@@ -40,26 +37,10 @@ export class OrderService {
     1 check the cart and products has length
     2-
    */
-  async create(dto: CreateOrderDto, user: UserDocument, file: Express.Multer.File) {
-    console.log({ dto });
-    const orders: Types.ObjectId[] = Array.from(
-      new Set(dto.products as unknown as Types.ObjectId[] || [])
-    ).map(id => new Types.ObjectId(id));
+  async create(dto: CreateOrderDto, user: UserDocument) {
+    
 
-    if (orders && (await this.orderRepository.find({ filter: { _id: { $in:  } } })).length != dto.products.length) {
-      throw new NotFoundException("Brand Id is not found ")
-    }
-
-
-
-    // const [Order] = await this.orderRepository.create({
-    //   data: [{
-    //     ...dto,
-    //     // createdBy: user._id,
-    //   }],
-    // });
-
-    return Order;
+    return "DONE";
   }
   // --------------------------------------
   async findAll(data: FindAllDto, archive: boolean = false)

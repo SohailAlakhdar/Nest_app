@@ -1,10 +1,7 @@
 import { MongooseModule, Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Types, Document, HydratedDocument, UpdateQuery } from 'mongoose';
-import slugify from 'slugify';
-import { OrderStatusEnum, OrderStatusNameEnum, PaymentMethodEnum } from 'src/commen/enums/order.enum';
+import { Types, HydratedDocument } from 'mongoose';
+import { OrderStatusEnum, PaymentMethodEnum } from 'src/commen/enums/order.enum';
 import { IOrder, IOrderProduct } from 'src/commen/interfaces/order.interface';
-import { IProduct } from 'src/commen/interfaces/product.interface';
-import { IUser } from 'src/commen/interfaces/user.interface';
 
 @Schema({ _id: false })
 export class OrderProduct implements IOrderProduct {
@@ -18,13 +15,15 @@ export class OrderProduct implements IOrderProduct {
     productId: Types.ObjectId
 
     @Prop({ required: true })
-    price: number;
+    unitprice: number;
+    @Prop({ required: true })
+    finalTotal: number;
 
     @Prop({ required: true })
     quantity: number;
 
     @Prop()
-    image?: string;
+    image: string;
 }
 
 export const OrderProductSchema =

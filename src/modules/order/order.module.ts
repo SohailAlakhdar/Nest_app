@@ -11,10 +11,15 @@ import { TokenRepository } from 'src/DB/repository/token.repository';
 import { TokenService } from 'src/commen/services/token.service';
 import { CartRepository } from 'src/DB/repository/cart.repository';
 import { ProductRepository } from 'src/DB/repository/product.repository';
+import { OrderRepository } from 'src/DB/repository/order.repository';
+import { S3Service } from 'src/commen/services/s3.service';
+import { BrandRepository } from 'src/DB/repository/brand.repository';
+import { BrandModel } from 'src/DB/models/brand.model';
+import { OrderModel } from 'src/DB/models/order.model';
 
 @Module({
-  imports: [UserModel, ProductModel, CartModel, TokenModel],
+  imports: [OrderModel, UserModel, ProductModel, CartModel, TokenModel, BrandModel],
   controllers: [OrderController],
-  providers: [OrderService, CartService, UserRepository, ProductRepository, CartRepository, TokenService, TokenRepository],
+  providers: [OrderService, CartService, BrandRepository, UserRepository, OrderRepository, S3Service, ProductRepository, CartRepository, TokenService, TokenRepository],
 })
 export class OrderModule { }

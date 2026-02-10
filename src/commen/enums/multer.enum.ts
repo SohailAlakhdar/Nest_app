@@ -8,5 +8,6 @@ export enum FolderPathEnum {
     Brand = "Brand",
     Category = "Category",
     Product = "Product",
+    Coupon = 'Coupon',
     Order = "Order"
 }

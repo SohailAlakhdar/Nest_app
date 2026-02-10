@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
-import {  UpdateCategoryDto } from './dto/update-category.dto';
+import { UpdateCategoryDto } from './dto/update-category.dto';
 import { CategoryRepository } from 'src/DB/repository/category.repository';
 import { S3Service } from 'src/commen/services/s3.service';
 import { UserRepository } from 'src/DB/repository/user.repository';
@@ -8,16 +8,18 @@ import { UserDocument } from 'src/DB/models/user.model';
 import { CategoryDocument } from 'src/DB/models/category.model';
 import { Lean } from 'src/DB/repository/database.repository';
 import { FolderPathEnum, storageEnum } from 'src/commen/enums/multer.enum';
-import { set, Types } from 'mongoose';
+import { Types } from 'mongoose';
 import { BrandRepository } from 'src/DB/repository/brand.repository';
 import { randomUUID } from 'crypto';
-import { PipelineStage } from 'mongoose';
 import { FindAllDto } from 'src/commen/dtos/search.dto';
 
 @Injectable()
 export class CategoryService {
-  constructor(private readonly categoryRepository: CategoryRepository, private readonly s3Service: S3Service,
-    private readonly userRepository: UserRepository, private readonly brandRepository: BrandRepository) { }
+  constructor(
+    private readonly categoryRepository: CategoryRepository,
+    private readonly s3Service: S3Service,
+    private readonly userRepository: UserRepository,
+    private readonly brandRepository: BrandRepository) { }
 
 
   async create(createCategoryDto: CreateCategoryDto, user: UserDocument, file: Express.Multer.File) {
