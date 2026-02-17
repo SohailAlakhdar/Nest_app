@@ -2,21 +2,21 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { S3Service } from 'src/commen/services/s3.service';
 import { UserRepository } from 'src/DB/repository/user.repository';
 import { UserDocument } from 'src/DB/models/user.model';
-import { Lean } from 'src/DB/repository/database.repository';
-import { BrandRepository } from 'src/DB/repository/brand.repository';
-import { FindAllDto } from 'src/commen/dtos/search.dto';
 import { OrderDocument, OrderProduct } from 'src/DB/models/order.model';
 import { OrderRepository } from 'src/DB/repository/order.repository';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { ProductRepository } from 'src/DB/repository/product.repository';
 import { CartRepository } from 'src/DB/repository/cart.repository';
 import { CouponRepository } from 'src/DB/repository/coupon.repository';
-import { CouponDocument } from 'src/DB/models/coupon.model';
-import de from 'zod/v4/locales/de.js';
-import { OrderStatusEnum } from 'src/commen/enums/order.enum';
 import { randomUUID } from 'crypto';
 import { discountTypeEnum } from 'src/commen/enums/coupon.enum';
 import { CartService } from '../cart/cart.service';
+import { Types } from 'mongoose';
+import { PaymentService } from 'src/commen/services/payment.service';
+import { ProductDocument } from 'src/DB/models/product.model';
+import Stripe from 'stripe';
+import { OrderStatusEnum, PaymentMethodEnum } from 'src/commen/enums/order.enum';
+import type { Request } from 'express';
 
 @Injectable()
 export class OrderService {
@@ -28,28 +28,12 @@ export class OrderService {
     private readonly cartRepository: CartRepository,
     private readonly couponRepository: CouponRepository,
     private readonly cartService: CartService,
-    private readonly brandRepository: BrandRepository
+    private readonly paymentService: PaymentService,
   ) { }
 
-  /**
-   *
-  Usually you calculate:
-  subtotal
-  discount
-  tax
-  shipping
-  total price
+  async create(dto: CreateOrderDto, user: UserDocument): Promise<OrderDocument> {
+    console.log({ dto });
 
-    user: userId,
-    products: cart.products,
-    totalPrice,
-    status: 'PENDING',
-    paymentMethod
-
-    1 check the cart and products has length
-    2-
-   */
-  async create(dto: CreateOrderDto, user: UserDocument) {
     const cart = await this.cartRepository.findOne({
       filter: { createdBy: user._id },
       options:
@@ -59,7 +43,6 @@ export class OrderService {
       throw new NotFoundException('Cart is empty');
     }
     // calculate total price
-    let discount = 0;
     let coupon: any;
     if (dto.coupon) {
       coupon = await this.couponRepository.findOne({
@@ -69,6 +52,7 @@ export class OrderService {
           startDate: { $lte: new Date() },
         }
       });
+      console.log({ coupon });
       if (!coupon) {
         throw new NotFoundException('Invalid coupon code');
       }
@@ -76,11 +60,10 @@ export class OrderService {
         throw new NotFoundException('Coupon usage limit exceeded');
       }
       // calculat subtotal
-      discount = discountTypeEnum.Percent ? coupon.discount : (coupon.discount / cart.totalPrice) * 100;
-
 
     }
     let products: OrderProduct[] = [];
+    let total = 0;
     for (const product of cart.products) {
       const productData = await this.productRepository.findOne({
         filter: { _id: product.productId, stock: { $gte: product.quantity } },
@@ -88,27 +71,31 @@ export class OrderService {
       if (!productData) {
         throw new NotFoundException(`Product ${product.productId} is out of stock`);
       }
+      const finalTotal = productData.price * product.quantity;
       products.push({
         productId: product.productId,
         quantity: product.quantity,
-        finalTotal: product.price * product.quantity,
-        unitPrice: product.price,
+        finalTotal: finalTotal,
+        unitPrice: productData.salePrice || productData.price,
       });
-
+      total += finalTotal;
     }
+
     delete dto.coupon;
-    const createdOrder = await this.orderRepository.create({
+    const [createdOrder] = await this.orderRepository.create({
       data: [{
-        orderId: randomUUID().slice(0, 8),
         ...dto,
+        orderId: randomUUID().slice(0, 8),
         createdBy: user._id,
         products,
-        totalPrice: cart.totalPrice,
-        coupon: coupon?._id || null,
-        discount,
+        totalPrice: total,
+        coupon: coupon?._id,
+        status: OrderStatusEnum.PENDING,
+        discount: coupon?.discountType === discountTypeEnum.Percent ? coupon.discount : (coupon?.discount / cart.totalPrice) * 100 || 0,
       }]
     });
-    if (!createdOrder || createdOrder.length === 0) {
+
+    if (!createdOrder) {
       throw new BadRequestException('Failed to create order');
     }
     if (coupon) {
@@ -126,5 +113,60 @@ export class OrderService {
     await this.cartService.clearCart(user._id);
     return createdOrder;
   }
+  async checkout(orderId: Types.ObjectId, user: UserDocument): Promise<Stripe.Response<Stripe.Checkout.Session>> {
+    const order = await this.orderRepository.findOne({
+      filter: { _id: orderId, createdBy: user._id, status: OrderStatusEnum.PENDING, paymentMethod: PaymentMethodEnum.CARD },
+      options: { populate: [{ path: 'products.productId', select: 'name' }] }
+    });
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+    let discounts: Stripe.Checkout.SessionCreateParams.Discount[] = [];
+    if (order.coupon) {
+      const coupon = await this.paymentService.createCoupon({
+        name: order.coupon.toString(),
+        percent_off: order.discount,
+        duration: 'once',
+      });
+      discounts.push({ coupon: coupon.id });
+    }
+    const session = await this.paymentService.checkoutSession({
+      customer_email: user.email,
+      metadata: { orderId: order._id.toString() },
+      discounts,
+      line_items: order.products.map((item) => ({
+        price_data: {
+          currency: 'egp',
+          product_data: {
+            name: (item.productId as ProductDocument).name,
+          },
+          unit_amount: item.unitPrice * 100,
+        },
+        quantity: item.quantity,
+      })),
+    });
+    return session;
+  }
+
+  async webhook(req: Request) {
+    let event: Stripe.Event = await this.paymentService.Webhook(req);
+    const { orderId } = event.data.object.metadata as { orderId: string };
+    const order = await this.orderRepository.findOneAndUpdate({
+      filter: {
+        _id: Types.ObjectId.createFromHexString(orderId),
+        status: OrderStatusEnum.PENDING,
+        paymentMethod: PaymentMethodEnum.CARD,
+      },
+      update: {
+        paidAt: new Date(),
+        status: OrderStatusEnum.CONFIRMED
+      }
+    });
+    if (!order) {
+      throw new NotFoundException('Order not found or already processed');
+    }
+    return "";
+  }
 
 }
+

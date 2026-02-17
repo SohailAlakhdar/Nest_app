@@ -1,6 +1,4 @@
-
 import { Types } from 'mongoose';
-import { IBrand } from './brand.interface';
 import { OrderStatusEnum, PaymentMethodEnum } from '../enums/order.enum';
 import { IProduct } from './product.interface';
 import { IUser } from './user.interface';
@@ -26,7 +24,7 @@ export interface IOrder {
     paymentMethod: PaymentMethodEnum;
     paymentIntent?: string;
 
-
+    paidAt?: Date;
     status: OrderStatusEnum;
 
     address: string;

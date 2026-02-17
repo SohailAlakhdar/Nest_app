@@ -18,12 +18,13 @@ import { BrandModel } from 'src/DB/models/brand.model';
 import { OrderModel } from 'src/DB/models/order.model';
 import { CouponRepository } from 'src/DB/repository/coupon.repository';
 import { CouponModel } from 'src/DB/models/coupon.model';
+import { PaymentService } from 'src/commen/services/payment.service';
 
 @Module({
   imports: [OrderModel, UserModel, ProductModel, CartModel, TokenModel, BrandModel, CouponModel],
   controllers: [OrderController],
   providers: [OrderService, CartService, BrandRepository, UserRepository,
     OrderRepository, S3Service, ProductRepository, CartRepository,
-     TokenService, TokenRepository, CouponRepository,CartService ],
+    TokenService, TokenRepository, CouponRepository, CartService, PaymentService],
 })
 export class OrderModule { }

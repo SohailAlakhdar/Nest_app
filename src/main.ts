@@ -11,7 +11,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use('upload', express.static(path.resolve('upload')));
   app.use(setDefaultLangauage);
-
+  app.enableCors();
+  app.use("/order/webhook", express.raw({ type: 'application/json' }));
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

@@ -41,7 +41,7 @@ export class Order implements IOrder {
     })
     products: OrderProduct[];
 
-    @Prop({ type: Types.ObjectId, ref: 'Coupon', required: false })
+    @Prop({ type: Types.ObjectId, ref: 'Coupon', required: true })
     coupon?: string | ICoupon
     @Prop({ type: Types.ObjectId, ref: 'User', required: true })
     createdBy: Types.ObjectId | IUser;
@@ -67,15 +67,13 @@ export class Order implements IOrder {
 
     @Prop()
     paymentIntent?: string;
-
+    @Prop()
+    paidAt?: Date;
 
     @Prop({
         type: String,
         enum: OrderStatusEnum,
-        default: function (this: Order) {
-            return this.paymentMethod == PaymentMethodEnum.CARD ? OrderStatusEnum.CONFIRMED : OrderStatusEnum.PENDING
-        },
-
+        default: OrderStatusEnum.PENDING
     })
     status: OrderStatusEnum;
 
@@ -113,12 +111,11 @@ OrderSchema.pre('save', function (next) {
         // discount with percentage
         this.subTotal = this.totalPrice - (this.discount / 100) * this.totalPrice;
     }
+    next();
 });
 // hooks for update
 OrderSchema.pre(['findOneAndUpdate', 'updateOne'], function (next) {
     const query = this.getQuery()
-    console.log({ query });
-    console.log(query.paranoid);
     if (query.paranoid == false || query.paranoId == false) {
         this.setQuery({ ...query });
     } else {
@@ -130,7 +127,6 @@ OrderSchema.pre(['findOneAndUpdate', 'updateOne'], function (next) {
 // hooks for search
 OrderSchema.pre(["find", "findOne", 'countDocuments'], async function (next) {
     const query = this.getQuery();
-    console.log({ query: query });
     if (query.paranoid === false) {
         this.setQuery({ ...query });
     } else {

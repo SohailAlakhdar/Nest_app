@@ -61,8 +61,6 @@ export class CartService {
       quantity: dto.quantity,
       price: product.salePrice ? product.salePrice : product.price,
     });
-    console.log("--------");
-
     cart.totalPrice = this.calculateTotal(cart.products);
     return cart.save();
 
@@ -117,10 +115,7 @@ export class CartService {
     if (!cart) {
       throw new NotFoundException('Cart or product not found');
     }
-    // Recalculate total price after removing the item
-
-    // Save the cart with updated total
-    return cart.save();
+    return cart as CartDocument;
   }
 
 
