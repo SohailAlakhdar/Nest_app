@@ -16,10 +16,14 @@ import { S3Service } from 'src/commen/services/s3.service';
 import { BrandRepository } from 'src/DB/repository/brand.repository';
 import { BrandModel } from 'src/DB/models/brand.model';
 import { OrderModel } from 'src/DB/models/order.model';
+import { CouponRepository } from 'src/DB/repository/coupon.repository';
+import { CouponModel } from 'src/DB/models/coupon.model';
 
 @Module({
-  imports: [OrderModel, UserModel, ProductModel, CartModel, TokenModel, BrandModel],
+  imports: [OrderModel, UserModel, ProductModel, CartModel, TokenModel, BrandModel, CouponModel],
   controllers: [OrderController],
-  providers: [OrderService, CartService, BrandRepository, UserRepository, OrderRepository, S3Service, ProductRepository, CartRepository, TokenService, TokenRepository],
+  providers: [OrderService, CartService, BrandRepository, UserRepository,
+    OrderRepository, S3Service, ProductRepository, CartRepository,
+     TokenService, TokenRepository, CouponRepository,CartService ],
 })
 export class OrderModule { }

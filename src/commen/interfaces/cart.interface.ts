@@ -15,7 +15,7 @@ import { IProduct } from "./product.interface";
 import { IUser } from "./user.interface";
 
 export interface ICartProduct {
-    product: Types.ObjectId | IProduct;
+    productId: Types.ObjectId | IProduct;
     quantity: number;
     price?: number;
     createdAt?: Date;
@@ -27,7 +27,6 @@ export interface ICart {
     createdBy: Types.ObjectId | IUser;
     products: ICartProduct[];
     totalPrice: number;
-    isActive: boolean;
 
     createdAt?: Date;
     updatedAt?: Date;

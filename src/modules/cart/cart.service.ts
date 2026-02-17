@@ -24,7 +24,7 @@ export class CartService {
     if (!cart) {
       const [createdCart] = await this.cartRepository.create({
         data: [{
-          createdBy: userId, isActive: true,
+          createdBy: userId,
         }],
       });
       if (!createdCart) throw new BadRequestException("Fail to create cart");
@@ -42,7 +42,7 @@ export class CartService {
     if (!cart) {
       const newCart = await this.getCart(userId) as CartDocument;
       newCart.products.push({
-        product: dto.productId,
+        productId: dto.productId,
         quantity: dto.quantity,
         price: product.salePrice ? product.salePrice : product.price,
       });
@@ -50,14 +50,14 @@ export class CartService {
       return newCart.save();
     }
     const existsProduct = cart.products.some(
-      (ele) => ele.product.toString() === dto.productId.toString()
+      (ele) => ele.productId.toString() === dto.productId.toString()
     )
 
     if (existsProduct) {
       throw new BadRequestException('The product already exists in the cart');
     }
     cart.products.push({
-      product: dto.productId,
+      productId: dto.productId,
       quantity: dto.quantity,
       price: product.salePrice ? product.salePrice : product.price,
     });
@@ -77,7 +77,7 @@ export class CartService {
     const cart = await this.getCart(userId); // find the cart
 
     const cartItemIndex = cart.products.findIndex(
-      (item) => item.product.toString() === productId.toString(),
+      (item) => item.productId.toString() === productId.toString(),
     );
     if (cartItemIndex === -1) {
       throw new NotFoundException('Product not found inside the cart');

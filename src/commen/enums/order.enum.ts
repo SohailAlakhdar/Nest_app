@@ -7,12 +7,12 @@ export enum OrderStatusNameEnum {
     FAILED = "FAILED",
 }
 export enum OrderStatusEnum {
-    PENDING = 0,
-    CONFIRMED = 1,
-    SHIPPED = 2,
-    DELIVERED = 3,
-    CANCELLED = 4,
-    FAILED = 5,
+    PENDING = 0, // 🕒 Order is created but not completed yet.
+    CONFIRMED = 1, // ✅ Order is valid and accepted.
+    SHIPPED = 2, // 🚚 Order is on the way to the customer.
+    DELIVERED = 3, // 📦 Order has been delivered to the customer.
+    CANCELLED = 4, // ❌ Order has been cancelled by the customer or the system.
+    FAILED = 5, // ⚠️ Order processing failed due to payment or other issues.
 }
 
 export enum PaymentMethodEnum {

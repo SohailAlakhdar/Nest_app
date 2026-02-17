@@ -3,6 +3,8 @@ import { Types } from 'mongoose';
 import { IBrand } from './brand.interface';
 import { OrderStatusEnum, PaymentMethodEnum } from '../enums/order.enum';
 import { IProduct } from './product.interface';
+import { IUser } from './user.interface';
+import { ICoupon } from './coupon.interface';
 
 export interface IOrder {
     _id?: Types.ObjectId;
@@ -12,20 +14,18 @@ export interface IOrder {
 
 
     products: IOrderProduct[]
-    userId: Types.ObjectId
-
+    createdBy: Types.ObjectId | IUser;
+    coupon?: string | ICoupon;
 
     deliveredAt?: Date;
 
     totalPrice: number;
     discount: number
-    subTotal: number
+    subTotal?: number
 
     paymentMethod: PaymentMethodEnum;
     paymentIntent?: string;
 
-    isPaid?: boolean;
-    paidAt?: Date;
 
     status: OrderStatusEnum;
 
@@ -35,7 +35,6 @@ export interface IOrder {
 
     cancelReason?: string;
 
-    createdBy?: Types.ObjectId;
     updatedBy?: Types.ObjectId;
 
     freezedAt?: Date;
@@ -46,16 +45,10 @@ export interface IOrder {
 }
 export interface IOrderProduct {
     _id?: Types.ObjectId;
-
-    name: string;
-    slug?: string;
-
     productId: Types.ObjectId | IProduct
-    unitprice: number;
+    unitPrice: number;
     finalTotal: number;
     quantity: number;
-    image?: string;
-
     createdAt?: Date;
     updatedAt?: Date;
 }

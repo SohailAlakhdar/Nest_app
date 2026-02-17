@@ -8,7 +8,7 @@ import { IUser } from 'src/commen/interfaces/user.interface';
 @Schema({ _id: false })
 export class CartProduct implements ICartProduct {
     @Prop({ type: Types.ObjectId, ref: 'Product', required: true })
-    product: Types.ObjectId | IProduct;
+    productId: Types.ObjectId | IProduct;
     @Prop({ required: true, min: 1 })
     quantity: number;
     @Prop({ required: true })
@@ -33,9 +33,6 @@ export class Cart implements ICart {
 
     @Prop({ default: 0 })
     totalPrice: number;
-
-    @Prop({ default: true })
-    isActive: boolean;
 
     @Prop({ type: Date })
     freezedAt?: Date;

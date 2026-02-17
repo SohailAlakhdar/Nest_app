@@ -1,12 +1,11 @@
-import { Types } from 'mongoose';
-import { IsNotEmpty, IsOptional, IsArray, ValidateNested, IsEnum, Matches, validate } from 'class-validator';
-import { IOrderProduct } from 'src/commen/interfaces/order.interface';
+import { IsNotEmpty, IsOptional, IsArray, ValidateNested, IsEnum, Matches, validate, IsString } from 'class-validator';
 import { PaymentMethodEnum } from 'src/commen/enums/order.enum';
-import { IsObjectId } from 'src/commen/decorators/mongoDBIds.decorator';
 
 export class CreateOrderDto {
-    @IsObjectId({ each: true })
-    products: IOrderProduct[];
+    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    coupon?: string
 
     @IsNotEmpty()
     @IsEnum(PaymentMethodEnum)

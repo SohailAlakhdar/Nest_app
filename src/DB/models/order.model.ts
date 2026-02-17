@@ -1,29 +1,24 @@
 import { MongooseModule, Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types, HydratedDocument } from 'mongoose';
 import { OrderStatusEnum, PaymentMethodEnum } from 'src/commen/enums/order.enum';
+import { ICoupon } from 'src/commen/interfaces/coupon.interface';
 import { IOrder, IOrderProduct } from 'src/commen/interfaces/order.interface';
+import { IProduct } from 'src/commen/interfaces/product.interface';
+import { IUser } from 'src/commen/interfaces/user.interface';
 
 @Schema({ _id: false })
 export class OrderProduct implements IOrderProduct {
-    @Prop({ required: true })
-    name: string;
-
-    @Prop()
-    slug?: string;
-
     @Prop({ type: Types.ObjectId, required: true, ref: 'Product' })
-    productId: Types.ObjectId
+    productId: Types.ObjectId | IProduct;
 
     @Prop({ required: true })
-    unitprice: number;
+    unitPrice: number;
     @Prop({ required: true })
     finalTotal: number;
 
     @Prop({ required: true })
     quantity: number;
 
-    @Prop()
-    image: string;
 }
 
 export const OrderProductSchema =
@@ -46,16 +41,18 @@ export class Order implements IOrder {
     })
     products: OrderProduct[];
 
+    @Prop({ type: Types.ObjectId, ref: 'Coupon', required: false })
+    coupon?: string | ICoupon
     @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-    userId: Types.ObjectId;
+    createdBy: Types.ObjectId | IUser;
 
     @Prop()
     deliveredAt?: Date;
 
     @Prop()
     discount: number;
-    @Prop({ required: true })
-    subTotal: number;
+    @Prop()
+    subTotal?: number;
 
     @Prop({ required: true })
     totalPrice: number;
@@ -71,11 +68,6 @@ export class Order implements IOrder {
     @Prop()
     paymentIntent?: string;
 
-    @Prop({ default: false })
-    isPaid?: boolean;
-
-    @Prop()
-    paidAt?: Date;
 
     @Prop({
         type: String,
@@ -99,8 +91,6 @@ export class Order implements IOrder {
     @Prop()
     cancelReason?: string;
 
-    @Prop({ type: Types.ObjectId })
-    createdBy?: Types.ObjectId;
 
     @Prop({ type: Types.ObjectId })
     updatedBy?: Types.ObjectId;
@@ -118,6 +108,12 @@ export type OrderDocument = HydratedDocument<Order>;
 
 
 // ---------------------------HOOKS
+OrderSchema.pre('save', function (next) {
+    if (this.isModified("totalPrice")) {
+        // discount with percentage
+        this.subTotal = this.totalPrice - (this.discount / 100) * this.totalPrice;
+    }
+});
 // hooks for update
 OrderSchema.pre(['findOneAndUpdate', 'updateOne'], function (next) {
     const query = this.getQuery()
