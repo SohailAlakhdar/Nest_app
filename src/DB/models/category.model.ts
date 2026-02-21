@@ -72,7 +72,6 @@ CategorySchema.pre('save', function (next) {
             strict: true,
             remove: /[*+~.()'"!:@]/g,
         });
-        console.log(this.slug);
 
     }
     next();
@@ -99,7 +98,6 @@ CategorySchema.pre(['findOneAndUpdate', 'updateOne'], function (next) {
 // hooks for search
 CategorySchema.pre(["find", "findOne", 'countDocuments'], async function (next) {
     const query = this.getQuery();
-    // console.log({ query: query });
     if (query.paranoid === false) {
         this.setQuery({ ...query });
     } else {

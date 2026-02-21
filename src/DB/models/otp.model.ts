@@ -39,7 +39,6 @@ otpSchema.pre(
     this: OtpDocument & { wasNew: boolean; plainOtp?: string },
     next,
   ) {
-    console.log({ isNew: this.isNew });
     this.wasNew = this.isNew;
     if (this.isModified('code')) {
       this.plainOtp = this.code;
@@ -57,12 +56,6 @@ otpSchema.post(
     next,
   ) {
     // const that = this as OtpDocument & { wasNew: boolean; plainOtp?: string };
-    console.log({
-      email: (this.createdBy as any).email,
-      otp: this.plainOtp,
-      wasNew: this.wasNew,
-      type: doc.type,
-    });
     if (this.wasNew && this.plainOtp) {
       emailEvent.emit(doc.type, {
         to: (this.createdBy as any).email,

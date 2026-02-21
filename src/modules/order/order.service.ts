@@ -20,6 +20,7 @@ import type { Request } from 'express';
 
 @Injectable()
 export class OrderService {
+
   constructor(
     private readonly orderRepository: OrderRepository,
     private readonly s3Service: S3Service,
@@ -32,7 +33,6 @@ export class OrderService {
   ) { }
 
   async create(dto: CreateOrderDto, user: UserDocument): Promise<OrderDocument> {
-    console.log({ dto });
 
     const cart = await this.cartRepository.findOne({
       filter: { createdBy: user._id },
@@ -52,7 +52,6 @@ export class OrderService {
           startDate: { $lte: new Date() },
         }
       });
-      console.log({ coupon });
       if (!coupon) {
         throw new NotFoundException('Invalid coupon code');
       }
@@ -110,9 +109,10 @@ export class OrderService {
         update: { $inc: { stock: -product.quantity } }
       });
     }
-    await this.cartService.clearCart(user._id);
+    // await this.cartService.clearCart(user._id);
     return createdOrder;
   }
+
   async checkout(orderId: Types.ObjectId, user: UserDocument): Promise<Stripe.Response<Stripe.Checkout.Session>> {
     const order = await this.orderRepository.findOne({
       filter: { _id: orderId, createdBy: user._id, status: OrderStatusEnum.PENDING, paymentMethod: PaymentMethodEnum.CARD },
@@ -145,12 +145,27 @@ export class OrderService {
         quantity: item.quantity,
       })),
     });
+    const method = await this.paymentService.createPaymentMethod({
+      type: 'card',
+      card: {
+        token: 'tok_visa',
+      },
+    });
+    const paymentIntent = await this.paymentService.createPaymentIntent({
+      amount: order.totalPrice * 100,
+      payment_method: method.id,
+      currency: 'egp',
+      metadata: { orderId: order._id.toString() },
+    });
+    order.paymentIntent = paymentIntent.id;
+    order.save();
     return session;
   }
 
-  async webhook(req: Request) {
-    let event: Stripe.Event = await this.paymentService.Webhook(req);
-    const { orderId } = event.data.object.metadata as { orderId: string };
+  async webhook(req: Request, signature: string): Promise<any> {
+    console.log("WEBHOOK");
+    let event: Stripe.Event = await this.paymentService.webhook(req, signature);
+    const orderId = (event as any).data.object.metadata?.orderId as string;
     const order = await this.orderRepository.findOneAndUpdate({
       filter: {
         _id: Types.ObjectId.createFromHexString(orderId),
@@ -165,6 +180,8 @@ export class OrderService {
     if (!order) {
       throw new NotFoundException('Order not found or already processed');
     }
+    const paymentIntent = await this.paymentService.confirmPaymentIntent(order?.paymentIntent as string);
+    console.log({ paymentIntent });
     return "";
   }
 

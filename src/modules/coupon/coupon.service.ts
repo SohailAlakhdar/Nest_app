@@ -224,7 +224,6 @@ export class CouponService {
         },
       },
     })
-    console.log("Re");
 
     if (!coupon) {
       throw new NotFoundException("coupon not found")

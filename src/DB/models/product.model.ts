@@ -138,7 +138,6 @@ ProductSchema.pre(['findOneAndUpdate', 'updateOne'], function (next) {
       });    }
 
     const query = this.getQuery()
-    console.log({ query });
     if (query.paranoid == false || query.paranoId == false) {
         this.setQuery({ ...query });
     } else {
@@ -150,7 +149,6 @@ ProductSchema.pre(['findOneAndUpdate', 'updateOne'], function (next) {
 // hooks for search
 ProductSchema.pre(["find", "findOne", 'countDocuments'], async function (next) {
     const query = this.getQuery();
-    console.log({ query: query });
     if (query.paranoid === false) {
         this.setQuery({ ...query });
     } else {

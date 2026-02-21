@@ -50,8 +50,6 @@ export type CartDocument = HydratedDocument<Cart>;
 // hooks for update
 CartSchema.pre(['findOneAndUpdate', 'updateOne'], function (next) {
     const query = this.getQuery()
-    console.log({ query });
-    console.log(query.paranoid);
     if (query.paranoid == false || query.paranoId == false) {
         this.setQuery({ ...query });
     } else {
@@ -63,7 +61,6 @@ CartSchema.pre(['findOneAndUpdate', 'updateOne'], function (next) {
 // hooks for search
 CartSchema.pre(["find", "findOne", 'countDocuments'], async function (next) {
     const query = this.getQuery();
-    console.log({ query: query });
     if (query.paranoid === false) {
         this.setQuery({ ...query });
     } else {

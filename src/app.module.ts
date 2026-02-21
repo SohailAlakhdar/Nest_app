@@ -17,7 +17,7 @@ import { CouponModule } from './modules/coupon/coupon.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: resolve('./config/.env.development'),
+      envFilePath: resolve('./config/.env.dev'),
       isGlobal: true,
     }),
     MongooseModule.forRoot(process.env.DB_URI as string, {

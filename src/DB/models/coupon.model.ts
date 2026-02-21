@@ -79,7 +79,6 @@ CouponSchema.pre('save', function (next) {
             strict: true,
             remove: /[*+~.()'"!:@]/g,
         });
-        console.log(this.slug);
     }
     if (this.endDate && this.endDate.getTime() < Date.now()) {
         this.freezedAt = new Date();
@@ -108,7 +107,6 @@ CouponSchema.pre(['findOneAndUpdate', 'updateOne'], function (next) {
 // hooks for search
 CouponSchema.pre(["find", "findOne", 'countDocuments'], async function (next) {
     const query = this.getQuery();
-    // console.log({ query: query });
     if (query.paranoid === false) {
         this.setQuery({ ...query });
     } else {
