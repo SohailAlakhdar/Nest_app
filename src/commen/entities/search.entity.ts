@@ -1,5 +1,5 @@
 export class FindAllResponse<T = any> {
-    result: {
+    results: {
         totalDocs: number | undefined;
         totalPages: number | undefined;
         page: number;

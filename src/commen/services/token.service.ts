@@ -25,7 +25,7 @@ export class TokenService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly tokenRepository: TokenRepository,
-  ) {}
+  ) { }
   generateToken = async ({
     payload,
     secret = process.env.ACCESS_USER_TOKEN_SIGNATURE as string,
@@ -161,31 +161,30 @@ export class TokenService {
   };
 }
 
-
 //   generate access_token and refresh_token
-  // createLoginCredentials = async (user: UserDocument) => {
-  //   const signatureLevel = await this.detectSignatureLevel(user.role);
-  //   const signatuers = await this.getSignature(signatureLevel);
-  //   const jwtid: string = uuid();
-  //   const access_token = await this.generateToken({
-  //     payload: { _id: user._id },
-  //     secret: signatuers.access_token,
-  //     options: {
-  //       expiresIn: Number(process.env.ACCESS_TOKEN_EXPIRES_IN),
-  //       jwtid,
-  //     },
-  //   });
-  //   const refresh_token = await this.generateToken({
-  //     payload: { _id: user._id },
+// createLoginCredentials = async (user: UserDocument) => {
+//   const signatureLevel = await this.detectSignatureLevel(user.role);
+//   const signatuers = await this.getSignature(signatureLevel);
+//   const jwtid: string = uuid();
+//   const access_token = await this.generateToken({
+//     payload: { _id: user._id },
+//     secret: signatuers.access_token,
+//     options: {
+//       expiresIn: Number(process.env.ACCESS_TOKEN_EXPIRES_IN),
+//       jwtid,
+//     },
+//   });
+//   const refresh_token = await this.generateToken({
+//     payload: { _id: user._id },
 
-  //     secret: signatuers.refresh_token,
-  //     options: {
-  //       expiresIn: Number(process.env.REFRESH_TOKEN_EXPIRES_IN),
-  //       jwtid,
-  //     },
-  //   });
-  //   return {
-  //     access_token,
-  //     refresh_token,
-  //   };
-  // };
+//     secret: signatuers.refresh_token,
+//     options: {
+//       expiresIn: Number(process.env.REFRESH_TOKEN_EXPIRES_IN),
+//       jwtid,
+//     },
+//   });
+//   return {
+//     access_token,
+//     refresh_token,
+//   };
+// };
